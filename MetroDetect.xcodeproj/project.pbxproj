@@ -1,0 +1,345 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		143F7A310FE284BB9A3B4CBF /* MetroTripState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134B8D8EA13AF3C3AD4A0D05 /* MetroTripState.swift */; };
+		1F4DDCAAF10DCC71E686A563 /* MetroStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92594807AC8FDC585538172 /* MetroStation.swift */; };
+		21ED3661CD5B119978188413 /* MetroDetectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA0E132A22DC9989E172789 /* MetroDetectApp.swift */; };
+		540E7E4D93E18465A3571DDA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F1E59799310D90211C6E18 /* ContentView.swift */; };
+		BC96D74F993D30E63D21BFB9 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698E2F2256312D41CBC37822 /* LocationService.swift */; };
+		F1A0997BBB8B13A2F8BB4AA3 /* MetroLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CC6BDAA44207298F58CA77 /* MetroLine.swift */; };
+		F28276F0BE8AF59086C08A62 /* MetroViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E40E3D3B13528A1777CAB /* MetroViewModel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		134B8D8EA13AF3C3AD4A0D05 /* MetroTripState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroTripState.swift; sourceTree = "<group>"; };
+		54F1E59799310D90211C6E18 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		698E2F2256312D41CBC37822 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		6C9E40E3D3B13528A1777CAB /* MetroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroViewModel.swift; sourceTree = "<group>"; };
+		78754D12CF58E282F1F2EBE5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		82CC6BDAA44207298F58CA77 /* MetroLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroLine.swift; sourceTree = "<group>"; };
+		9EA0E132A22DC9989E172789 /* MetroDetectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroDetectApp.swift; sourceTree = "<group>"; };
+		A5F176667C85C6FAE597EBCB /* MetroDetect.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MetroDetect.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E92594807AC8FDC585538172 /* MetroStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroStation.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		062CAE646074BFE32A27442E /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				6C9E40E3D3B13528A1777CAB /* MetroViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		064BD5B31A25657EF0AA415E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				78754D12CF58E282F1F2EBE5 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		6B16C8EC22C2BD4697672C34 /* MetroDetect */ = {
+			isa = PBXGroup;
+			children = (
+				54F1E59799310D90211C6E18 /* ContentView.swift */,
+				9EA0E132A22DC9989E172789 /* MetroDetectApp.swift */,
+				90D983A00E9B35144451DFBE /* Models */,
+				064BD5B31A25657EF0AA415E /* Resources */,
+				E43A34A272DD31E203A3AB71 /* Services */,
+				062CAE646074BFE32A27442E /* ViewModels */,
+			);
+			path = MetroDetect;
+			sourceTree = "<group>";
+		};
+		7C2244C9499D7C2C35A78D35 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A5F176667C85C6FAE597EBCB /* MetroDetect.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		90D983A00E9B35144451DFBE /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				82CC6BDAA44207298F58CA77 /* MetroLine.swift */,
+				E92594807AC8FDC585538172 /* MetroStation.swift */,
+				134B8D8EA13AF3C3AD4A0D05 /* MetroTripState.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E43A34A272DD31E203A3AB71 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				698E2F2256312D41CBC37822 /* LocationService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F39F6555891E77674056672B = {
+			isa = PBXGroup;
+			children = (
+				6B16C8EC22C2BD4697672C34 /* MetroDetect */,
+				7C2244C9499D7C2C35A78D35 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8718F6B9BCDDA46F944D4C76 /* MetroDetect */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2B7AA999E05147267D3AECE1 /* Build configuration list for PBXNativeTarget "MetroDetect" */;
+			buildPhases = (
+				A36AB39A11216F4342629AC3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MetroDetect;
+			packageProductDependencies = (
+			);
+			productName = MetroDetect;
+			productReference = A5F176667C85C6FAE597EBCB /* MetroDetect.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		409B26AD982166D9F9843566 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					8718F6B9BCDDA46F944D4C76 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = F1A8CECF9D840E4DB92E95BD /* Build configuration list for PBXProject "MetroDetect" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F39F6555891E77674056672B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7C2244C9499D7C2C35A78D35 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8718F6B9BCDDA46F944D4C76 /* MetroDetect */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A36AB39A11216F4342629AC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				540E7E4D93E18465A3571DDA /* ContentView.swift in Sources */,
+				BC96D74F993D30E63D21BFB9 /* LocationService.swift in Sources */,
+				21ED3661CD5B119978188413 /* MetroDetectApp.swift in Sources */,
+				F1A0997BBB8B13A2F8BB4AA3 /* MetroLine.swift in Sources */,
+				1F4DDCAAF10DCC71E686A563 /* MetroStation.swift in Sources */,
+				143F7A310FE284BB9A3B4CBF /* MetroTripState.swift in Sources */,
+				F28276F0BE8AF59086C08A62 /* MetroViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1C6E5C7AA5CABA96E799F187 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = MetroDetect/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.metrodetect.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		25DFD4EA51DB4879AE1ECCF3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = MetroDetect/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.metrodetect.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9BA184250040676A19D1F2B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AC8CFD1491D5ECBCA6A2228A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2B7AA999E05147267D3AECE1 /* Build configuration list for PBXNativeTarget "MetroDetect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				25DFD4EA51DB4879AE1ECCF3 /* Debug */,
+				1C6E5C7AA5CABA96E799F187 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F1A8CECF9D840E4DB92E95BD /* Build configuration list for PBXProject "MetroDetect" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AC8CFD1491D5ECBCA6A2228A /* Debug */,
+				9BA184250040676A19D1F2B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 409B26AD982166D9F9843566 /* Project object */;
+}

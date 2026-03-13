@@ -1,0 +1,27 @@
+name: MetroDetect
+options:
+  bundleIdPrefix: com.metrodetect
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+
+targets:
+  MetroDetect:
+    type: application
+    platform: iOS
+    sources:
+      - MetroDetect
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.metrodetect.app
+        SWIFT_VERSION: "5.9"
+        INFOPLIST_FILE: MetroDetect/Resources/Info.plist
+        DEVELOPMENT_TEAM: ""
+    info:
+      path: MetroDetect/Resources/Info.plist
+      properties:
+        UILaunchStoryboardName: LaunchScreen
+        NSLocationWhenInUseUsageDescription: "MetroDetect uses your location to detect when you are on the Copenhagen Metro."
+        NSLocationAlwaysAndWhenInUseUsageDescription: "MetroDetect uses your location in the background to detect metro travel."
+        UIBackgroundModes:
+          - location
