@@ -7,6 +7,10 @@ final class LocationService: NSObject, ObservableObject {
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var error: String?
 
+    private static let accuracyThreshold: Double = 200
+    private static let fallbackAccuracyThreshold: Double = 500
+    private static let stalenessLimit: TimeInterval = -30
+
     private let manager = CLLocationManager()
 
     override init() {
@@ -51,17 +55,18 @@ extension LocationService: CLLocationManagerDelegate {
         // Reject invalid fixes (negative accuracy means invalid)
         guard location.horizontalAccuracy >= 0 else { return }
 
-        let isStale = location.timestamp.timeIntervalSinceNow < -30
-        let isTooInaccurate = location.horizontalAccuracy > 200
+        let isStale = location.timestamp.timeIntervalSinceNow < Self.stalenessLimit
+        let isTooInaccurate = location.horizontalAccuracy > Self.accuracyThreshold
 
-        // Accept any valid, non-stale fix within 200m accuracy.
-        // Also accept any fix if the current location is stale to avoid
-        // showing an outdated position indefinitely.
+        // Accept any valid, non-stale fix within the accuracy threshold.
+        // When the current location is stale, accept fixes up to the fallback
+        // threshold to avoid showing an outdated position indefinitely.
         let currentIsStale = currentLocation.map {
-            $0.timestamp.timeIntervalSinceNow < -30
+            $0.timestamp.timeIntervalSinceNow < Self.stalenessLimit
         } ?? true
 
-        guard !isStale, (!isTooInaccurate || currentIsStale) else { return }
+        let withinFallback = location.horizontalAccuracy <= Self.fallbackAccuracyThreshold
+        guard !isStale, (!isTooInaccurate || (currentIsStale && withinFallback)) else { return }
 
         currentLocation = location
         // CLLocation.speed is -1 when unavailable; clamp to 0
