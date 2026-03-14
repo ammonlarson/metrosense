@@ -12,6 +12,7 @@ final class MetroViewModel: ObservableObject {
 
     // Track departure station when a trip begins
     private var departureStation: MetroStation?
+    private var hasNotifiedCurrentTrip = false
 
     init(locationService: LocationService = LocationService()) {
         self.locationService = locationService
@@ -20,6 +21,7 @@ final class MetroViewModel: ObservableObject {
 
     func start() {
         locationService.requestPermission()
+        NotificationService.shared.requestPermission()
     }
 
     // MARK: - Private
@@ -49,12 +51,20 @@ final class MetroViewModel: ObservableObject {
                    let line = likelyLine(near: location, from: departure) {
                     departureStation = departure
                     tripState = .onMetro(line: line, fromStation: departure, speed: speed)
+                    if !hasNotifiedCurrentTrip {
+                        hasNotifiedCurrentTrip = true
+                        NotificationService.shared.sendMetroDetected(
+                            line: line.rawValue,
+                            fromStation: departure.name
+                        )
+                    }
                 }
             } else if let station = nearby {
                 departureStation = station
                 tripState = .atStation(station)
             } else {
                 tripState = .idle
+                hasNotifiedCurrentTrip = false
             }
 
         case .onMetro(let line, let from, _):
@@ -73,6 +83,7 @@ final class MetroViewModel: ObservableObject {
             } else {
                 // Slowed down away from any station — treat as arrived/idle
                 tripState = .idle
+                hasNotifiedCurrentTrip = false
             }
 
         case .arrived(_, _, let to):

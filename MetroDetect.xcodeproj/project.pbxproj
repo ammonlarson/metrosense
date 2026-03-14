@@ -10,6 +10,8 @@
 		143F7A310FE284BB9A3B4CBF /* MetroTripState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134B8D8EA13AF3C3AD4A0D05 /* MetroTripState.swift */; };
 		1F4DDCAAF10DCC71E686A563 /* MetroStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92594807AC8FDC585538172 /* MetroStation.swift */; };
 		21ED3661CD5B119978188413 /* MetroDetectApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA0E132A22DC9989E172789 /* MetroDetectApp.swift */; };
+		26A8CD89409551D2C4208A1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D3CD3628C8843AF015C790C5 /* Assets.xcassets */; };
+		46EE9BCAF80F62FA940FF565 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F4D35A834FABE4CEFD5346 /* NotificationService.swift */; };
 		540E7E4D93E18465A3571DDA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F1E59799310D90211C6E18 /* ContentView.swift */; };
 		BC96D74F993D30E63D21BFB9 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698E2F2256312D41CBC37822 /* LocationService.swift */; };
 		F1A0997BBB8B13A2F8BB4AA3 /* MetroLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CC6BDAA44207298F58CA77 /* MetroLine.swift */; };
@@ -22,9 +24,11 @@
 		698E2F2256312D41CBC37822 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		6C9E40E3D3B13528A1777CAB /* MetroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroViewModel.swift; sourceTree = "<group>"; };
 		78754D12CF58E282F1F2EBE5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		79F4D35A834FABE4CEFD5346 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		82CC6BDAA44207298F58CA77 /* MetroLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroLine.swift; sourceTree = "<group>"; };
 		9EA0E132A22DC9989E172789 /* MetroDetectApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroDetectApp.swift; sourceTree = "<group>"; };
-		A5F176667C85C6FAE597EBCB /* MetroDetect.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MetroDetect.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A5F176667C85C6FAE597EBCB /* MetroDetect.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetroDetect.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3CD3628C8843AF015C790C5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E92594807AC8FDC585538172 /* MetroStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroStation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -40,6 +44,7 @@
 		064BD5B31A25657EF0AA415E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D3CD3628C8843AF015C790C5 /* Assets.xcassets */,
 				78754D12CF58E282F1F2EBE5 /* Info.plist */,
 			);
 			path = Resources;
@@ -80,6 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				698E2F2256312D41CBC37822 /* LocationService.swift */,
+				79F4D35A834FABE4CEFD5346 /* NotificationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -100,6 +106,7 @@
 			buildConfigurationList = 2B7AA999E05147267D3AECE1 /* Build configuration list for PBXNativeTarget "MetroDetect" */;
 			buildPhases = (
 				A36AB39A11216F4342629AC3 /* Sources */,
+				025050885CEFD1A93B7394A8 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -120,11 +127,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
-				TargetAttributes = {
-					8718F6B9BCDDA46F944D4C76 = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = F1A8CECF9D840E4DB92E95BD /* Build configuration list for PBXProject "MetroDetect" */;
 			developmentRegion = en;
@@ -145,6 +147,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		025050885CEFD1A93B7394A8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				26A8CD89409551D2C4208A1C /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A36AB39A11216F4342629AC3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -157,6 +170,7 @@
 				1F4DDCAAF10DCC71E686A563 /* MetroStation.swift in Sources */,
 				143F7A310FE284BB9A3B4CBF /* MetroTripState.swift in Sources */,
 				F28276F0BE8AF59086C08A62 /* MetroViewModel.swift in Sources */,
+				46EE9BCAF80F62FA940FF565 /* NotificationService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,7 +182,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5GSP7B436V;
 				INFOPLIST_FILE = MetroDetect/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -186,7 +200,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 5GSP7B436V;
 				INFOPLIST_FILE = MetroDetect/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

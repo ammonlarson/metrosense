@@ -16,7 +16,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.metrodetect.app
         SWIFT_VERSION: "5.9"
         INFOPLIST_FILE: MetroDetect/Resources/Info.plist
-        DEVELOPMENT_TEAM: ""
+        DEVELOPMENT_TEAM: E5787F652X
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: MetroDetect/Resources/Info.plist
       properties:
