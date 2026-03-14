@@ -1,4 +1,4 @@
-j# 🚨 STOP AND READ - MANDATORY INSTRUCTIONS 🚨
+# 🚨 STOP AND READ - MANDATORY INSTRUCTIONS 🚨
 
 ⚠️ **DO NOT SKIP THIS FILE.** ⚠️
 
@@ -345,7 +345,6 @@ Phase 4: Submission
 **Remember: This file is not a suggestion. It is a requirement.**
 
 **When in doubt, re-read this file. When finishing a task, verify all phases complete.**
-
 # PROJECT-SPECIFIC INFORMATION
 
 ---
