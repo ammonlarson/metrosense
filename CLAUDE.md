@@ -404,8 +404,8 @@ CLLocationManager → LocationService (@Published) → MetroViewModel (Combine) 
 |-----------|-------|----------|
 | Metro speed range | 8.0–25.0 m/s (29–90 km/h) | `MetroLine.swift` |
 | Station proximity | 150 meters | `MetroStation.swift` |
-| Location accuracy threshold | ≤50 meters | `LocationService.swift` |
-| Location staleness limit | 10 seconds | `LocationService.swift` |
+| Location accuracy threshold | ≤200 meters | `LocationService.swift` |
+| Location staleness limit | 30 seconds | `LocationService.swift` |
 | Distance filter | 10 meters | `LocationService.swift` |
 
 ## Permissions

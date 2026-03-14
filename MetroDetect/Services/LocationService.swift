@@ -48,11 +48,20 @@ extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
 
-        // Discard stale or inaccurate fixes
-        guard location.horizontalAccuracy >= 0,
-              location.horizontalAccuracy <= 50,
-              location.timestamp.timeIntervalSinceNow > -10
-        else { return }
+        // Reject invalid fixes (negative accuracy means invalid)
+        guard location.horizontalAccuracy >= 0 else { return }
+
+        let isStale = location.timestamp.timeIntervalSinceNow < -30
+        let isTooInaccurate = location.horizontalAccuracy > 200
+
+        // Accept any valid, non-stale fix within 200m accuracy.
+        // Also accept any fix if the current location is stale to avoid
+        // showing an outdated position indefinitely.
+        let currentIsStale = currentLocation.map {
+            $0.timestamp.timeIntervalSinceNow < -30
+        } ?? true
+
+        guard !isStale, (!isTooInaccurate || currentIsStale) else { return }
 
         currentLocation = location
         // CLLocation.speed is -1 when unavailable; clamp to 0
