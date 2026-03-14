@@ -23,10 +23,6 @@ final class MetroViewModel: ObservableObject {
         bindLocation()
     }
 
-    func reloadSettings() {
-        settings = NotificationSettings.load()
-    }
-
     func start() {
         locationService.requestPermission()
         NotificationService.shared.requestPermission()
@@ -51,18 +47,28 @@ final class MetroViewModel: ObservableObject {
         let nearby = nearbyStation(for: location)
         nearestStation = nearby
 
-        // Send proximity notification if enabled and near a station
-        if settings.proximityEnabled, let station = nearby {
-            let shouldNotify: Bool
-            switch settings.proximityStationFilter {
-            case .all:
-                shouldNotify = true
-            case .selected(let names):
-                shouldNotify = names.contains(station.name)
+        // Send proximity notifications using the user's configured radius
+        if settings.proximityEnabled {
+            let allStations = MetroLine.all.flatMap { $0.stations }
+            var stationsInRange = Set<String>()
+            for station in allStations {
+                let dist = station.distance(from: location)
+                if dist <= settings.proximityRadius {
+                    stationsInRange.insert(station.name)
+                    let shouldNotify: Bool
+                    switch settings.proximityStationFilter {
+                    case .all:
+                        shouldNotify = true
+                    case .selected(let names):
+                        shouldNotify = names.contains(station.name)
+                    }
+                    if shouldNotify {
+                        sendProximityNotificationIfNeeded(station: station)
+                    }
+                }
             }
-            if shouldNotify && station.distance(from: location) <= settings.proximityRadius {
-                sendProximityNotificationIfNeeded(station: station)
-            }
+            // Clear dedup for stations the user has left
+            notifiedProximityStations.subtract(notifiedProximityStations.subtracting(stationsInRange))
         }
 
         switch tripState {
@@ -134,11 +140,11 @@ final class MetroViewModel: ObservableObject {
         }
     }
 
-    private var lastProximityNotificationStation: String?
+    private var notifiedProximityStations = Set<String>()
 
     private func sendProximityNotificationIfNeeded(station: MetroStation) {
-        guard station.name != lastProximityNotificationStation else { return }
-        lastProximityNotificationStation = station.name
+        guard !notifiedProximityStations.contains(station.name) else { return }
+        notifiedProximityStations.insert(station.name)
 
         let content = UNMutableNotificationContent()
         content.title = "Near Station"

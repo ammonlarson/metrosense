@@ -5,10 +5,11 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     private let allStationNames: [String]
+    private let onSave: (NotificationSettings) -> Void
 
-    init() {
-        let loaded = NotificationSettings.load()
-        _settings = State(initialValue: loaded)
+    init(settings: NotificationSettings = .load(), onSave: @escaping (NotificationSettings) -> Void = { $0.save() }) {
+        _settings = State(initialValue: settings)
+        self.onSave = onSave
 
         // Collect unique station names across all lines
         var seen = Set<String>()
@@ -37,7 +38,7 @@ struct SettingsView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        settings.save()
+                        onSave(settings)
                         dismiss()
                     }
                     .disabled(!settings.isValid)
@@ -81,6 +82,12 @@ struct SettingsView: View {
             }
 
             if case .selected(let selected) = settings.proximityStationFilter {
+                if selected.isEmpty {
+                    Text("Select at least one station.")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+
                 ForEach(allStationNames, id: \.self) { name in
                     Button {
                         toggleStation(name, in: selected)
@@ -121,7 +128,7 @@ struct SettingsView: View {
         } else {
             updated.insert(name)
         }
-        settings.proximityStationFilter = updated.isEmpty ? .all : .selected(updated)
+        settings.proximityStationFilter = .selected(updated)
     }
 
     // MARK: - Movement Section

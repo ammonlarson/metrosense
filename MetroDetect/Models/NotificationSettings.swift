@@ -1,13 +1,13 @@
 import Foundation
 
-struct NotificationSettings: Equatable {
+struct NotificationSettings: Equatable, Codable {
     // MARK: - Proximity Notifications
 
     var proximityEnabled: Bool
     var proximityRadius: Double // meters
     var proximityStationFilter: StationFilter
 
-    enum StationFilter: Equatable {
+    enum StationFilter: Equatable, Codable {
         case all
         case selected(Set<String>) // station names
     }
@@ -53,62 +53,18 @@ struct NotificationSettings: Equatable {
 // MARK: - UserDefaults Persistence
 
 extension NotificationSettings {
-    private enum Keys {
-        static let proximityEnabled = "ns_proximityEnabled"
-        static let proximityRadius = "ns_proximityRadius"
-        static let stationFilterAll = "ns_stationFilterAll"
-        static let selectedStations = "ns_selectedStations"
-        static let movementEnabled = "ns_movementEnabled"
-        static let minimumSpeedMPS = "ns_minimumSpeedMPS"
-        static let maximumSpeedMPS = "ns_maximumSpeedMPS"
-        static let sustainedDuration = "ns_sustainedDuration"
-        static let requireStartAtStation = "ns_requireStartAtStation"
-        static let hasStoredSettings = "ns_hasStoredSettings"
-    }
+    private static let storageKey = "notificationSettings"
 
     func save(to defaults: UserDefaults = .standard) {
-        defaults.set(true, forKey: Keys.hasStoredSettings)
-        defaults.set(proximityEnabled, forKey: Keys.proximityEnabled)
-        defaults.set(proximityRadius, forKey: Keys.proximityRadius)
-
-        switch proximityStationFilter {
-        case .all:
-            defaults.set(true, forKey: Keys.stationFilterAll)
-            defaults.removeObject(forKey: Keys.selectedStations)
-        case .selected(let stations):
-            defaults.set(false, forKey: Keys.stationFilterAll)
-            defaults.set(Array(stations), forKey: Keys.selectedStations)
-        }
-
-        defaults.set(movementEnabled, forKey: Keys.movementEnabled)
-        defaults.set(minimumSpeedMPS, forKey: Keys.minimumSpeedMPS)
-        defaults.set(maximumSpeedMPS, forKey: Keys.maximumSpeedMPS)
-        defaults.set(sustainedDurationSeconds, forKey: Keys.sustainedDuration)
-        defaults.set(requireStartAtStation, forKey: Keys.requireStartAtStation)
+        guard let data = try? JSONEncoder().encode(self) else { return }
+        defaults.set(data, forKey: Self.storageKey)
     }
 
     static func load(from defaults: UserDefaults = .standard) -> NotificationSettings {
-        guard defaults.bool(forKey: Keys.hasStoredSettings) else {
+        guard let data = defaults.data(forKey: storageKey),
+              let settings = try? JSONDecoder().decode(NotificationSettings.self, from: data) else {
             return .default
         }
-
-        let stationFilter: StationFilter
-        if defaults.bool(forKey: Keys.stationFilterAll) {
-            stationFilter = .all
-        } else {
-            let names = defaults.stringArray(forKey: Keys.selectedStations) ?? []
-            stationFilter = names.isEmpty ? .all : .selected(Set(names))
-        }
-
-        return NotificationSettings(
-            proximityEnabled: defaults.bool(forKey: Keys.proximityEnabled),
-            proximityRadius: defaults.double(forKey: Keys.proximityRadius),
-            proximityStationFilter: stationFilter,
-            movementEnabled: defaults.bool(forKey: Keys.movementEnabled),
-            minimumSpeedMPS: defaults.double(forKey: Keys.minimumSpeedMPS),
-            maximumSpeedMPS: defaults.double(forKey: Keys.maximumSpeedMPS),
-            sustainedDurationSeconds: defaults.double(forKey: Keys.sustainedDuration),
-            requireStartAtStation: defaults.bool(forKey: Keys.requireStartAtStation)
-        )
+        return settings
     }
 }

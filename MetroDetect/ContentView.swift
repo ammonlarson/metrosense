@@ -22,10 +22,11 @@ struct ContentView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingSettings, onDismiss: {
-                viewModel.reloadSettings()
-            }) {
-                SettingsView()
+            .sheet(isPresented: $showingSettings) {
+                SettingsView(settings: viewModel.settings) { newSettings in
+                    newSettings.save()
+                    viewModel.settings = newSettings
+                }
             }
         }
         .onAppear {
