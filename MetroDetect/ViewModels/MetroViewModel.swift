@@ -9,6 +9,9 @@ final class MetroViewModel: ObservableObject {
     @Published var speedKMH: Double = 0
     @Published var settings: NotificationSettings
 
+    var currentLocation: CLLocation? { locationService.currentLocation }
+    var currentSpeed: Double { locationService.currentSpeed }
+
     private let locationService: LocationService
     private var cancellables = Set<AnyCancellable>()
 

@@ -23,7 +23,11 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showingSettings) {
-                SettingsView(settings: viewModel.settings) { newSettings in
+                SettingsView(
+                    settings: viewModel.settings,
+                    currentLocation: viewModel.currentLocation,
+                    currentSpeed: viewModel.currentSpeed
+                ) { newSettings in
                     newSettings.save()
                     viewModel.settings = newSettings
                 }

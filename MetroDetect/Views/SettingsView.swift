@@ -1,15 +1,26 @@
 import SwiftUI
+import CoreLocation
 
 struct SettingsView: View {
     @State private var settings: NotificationSettings
+    @State private var testResult: NotificationTestResult?
     @Environment(\.dismiss) private var dismiss
 
     private let allStationNames: [String]
     private let onSave: (NotificationSettings) -> Void
+    private let currentLocation: CLLocation?
+    private let currentSpeed: Double
 
-    init(settings: NotificationSettings = .load(), onSave: @escaping (NotificationSettings) -> Void = { $0.save() }) {
+    init(
+        settings: NotificationSettings = .load(),
+        currentLocation: CLLocation? = nil,
+        currentSpeed: Double = 0,
+        onSave: @escaping (NotificationSettings) -> Void = { $0.save() }
+    ) {
         _settings = State(initialValue: settings)
         self.onSave = onSave
+        self.currentLocation = currentLocation
+        self.currentSpeed = currentSpeed
 
         // Collect unique station names across all lines
         var seen = Set<String>()
@@ -29,6 +40,7 @@ struct SettingsView: View {
             Form {
                 proximitySection
                 movementSection
+                testSection
             }
             .navigationTitle("Notification Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -116,7 +128,7 @@ struct SettingsView: View {
             set: { isAll in
                 settings.proximityStationFilter = isAll
                     ? .all
-                    : .selected(Set(allStationNames))
+                    : .selected(Set())
             }
         )
     }
@@ -129,6 +141,85 @@ struct SettingsView: View {
             updated.insert(name)
         }
         settings.proximityStationFilter = .selected(updated)
+    }
+
+    // MARK: - Test Section
+
+    private var testSection: some View {
+        Section {
+            Button {
+                testResult = NotificationTestResult.evaluate(
+                    settings: settings,
+                    location: currentLocation,
+                    speed: currentSpeed
+                )
+            } label: {
+                Label("Test Notifications Now", systemImage: "bell.badge")
+            }
+            .disabled(!settings.isValid)
+
+            if let result = testResult {
+                if result.proximityWouldFire {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Proximity: Would fire")
+                                .foregroundStyle(.primary)
+                            Text(result.proximityDetail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                    }
+                } else {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Proximity: Would not fire")
+                                .foregroundStyle(.primary)
+                            Text(result.proximityDetail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.red)
+                    }
+                }
+
+                if result.movementWouldFire {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Movement: Would fire")
+                                .foregroundStyle(.primary)
+                            Text(result.movementDetail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
+                    }
+                } else {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Movement: Would not fire")
+                                .foregroundStyle(.primary)
+                            Text(result.movementDetail)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.red)
+                    }
+                }
+            }
+        } header: {
+            Text("Test")
+        } footer: {
+            Text("Check whether a notification would fire right now based on your current location and speed.")
+        }
     }
 
     // MARK: - Movement Section
@@ -184,6 +275,86 @@ struct SettingsView: View {
         } footer: {
             Text("Get notified when movement matching metro speed is detected.")
         }
+    }
+}
+
+// MARK: - Notification Test Result
+
+struct NotificationTestResult {
+    let proximityWouldFire: Bool
+    let proximityDetail: String
+    let movementWouldFire: Bool
+    let movementDetail: String
+
+    static func evaluate(
+        settings: NotificationSettings,
+        location: CLLocation?,
+        speed: Double
+    ) -> NotificationTestResult {
+        // Evaluate proximity
+        let proximityResult: (Bool, String)
+        if !settings.proximityEnabled {
+            proximityResult = (false, "Proximity alerts are disabled.")
+        } else if let location {
+            let allStations = MetroLine.all.flatMap { $0.stations }
+            let stationsInRange = allStations.filter {
+                $0.distance(from: location) <= settings.proximityRadius
+            }
+
+            if stationsInRange.isEmpty {
+                let closest = allStations.min { $0.distance(from: location) < $1.distance(from: location) }
+                let detail: String
+                if let closest {
+                    let dist = Int(closest.distance(from: location))
+                    detail = "No stations within \(Int(settings.proximityRadius))m. Nearest: \(closest.name) (\(dist)m away)."
+                } else {
+                    detail = "No stations within \(Int(settings.proximityRadius))m."
+                }
+                proximityResult = (false, detail)
+            } else {
+                // Check station filter
+                let matchingStations: [MetroStation]
+                switch settings.proximityStationFilter {
+                case .all:
+                    matchingStations = stationsInRange
+                case .selected(let names):
+                    matchingStations = stationsInRange.filter { names.contains($0.name) }
+                }
+
+                if matchingStations.isEmpty {
+                    let inRangeNames = stationsInRange.map(\.name).joined(separator: ", ")
+                    proximityResult = (false, "Stations in range (\(inRangeNames)) are not in your selected filter.")
+                } else {
+                    let names = matchingStations.map(\.name).joined(separator: ", ")
+                    proximityResult = (true, "Near: \(names)")
+                }
+            }
+        } else {
+            proximityResult = (false, "Location unavailable.")
+        }
+
+        // Evaluate movement
+        let movementResult: (Bool, String)
+        if !settings.movementEnabled {
+            movementResult = (false, "Movement alerts are disabled.")
+        } else {
+            let speedKMH = String(format: "%.1f", speed * 3.6)
+            let inRange = speed >= settings.minimumSpeedMPS && speed <= settings.maximumSpeedMPS
+            if inRange {
+                movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedMPS * 3.6))–\(String(format: "%.0f", settings.maximumSpeedMPS * 3.6)) km/h).")
+            } else if speed < settings.minimumSpeedMPS {
+                movementResult = (false, "Speed \(speedKMH) km/h is below minimum (\(String(format: "%.0f", settings.minimumSpeedMPS * 3.6)) km/h).")
+            } else {
+                movementResult = (false, "Speed \(speedKMH) km/h is above maximum (\(String(format: "%.0f", settings.maximumSpeedMPS * 3.6)) km/h).")
+            }
+        }
+
+        return NotificationTestResult(
+            proximityWouldFire: proximityResult.0,
+            proximityDetail: proximityResult.1,
+            movementWouldFire: movementResult.0,
+            movementDetail: movementResult.1
+        )
     }
 }
 
