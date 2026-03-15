@@ -314,37 +314,50 @@ struct NotificationTestResult: Equatable {
         if !settings.proximityEnabled {
             proximityResult = (false, "Proximity alerts are disabled.")
         } else if let location {
+            let accuracy = location.horizontalAccuracy
             let allStations = MetroLine.all.flatMap { $0.stations }
-            let stationsInRange = allStations.filter {
-                $0.distance(from: location) <= settings.proximityRadius
-            }
 
-            if stationsInRange.isEmpty {
+            if accuracy > settings.proximityRadius {
                 let closest = allStations.min { $0.distance(from: location) < $1.distance(from: location) }
                 let detail: String
                 if let closest {
                     let dist = Int(closest.distance(from: location))
-                    detail = "No stations within \(Int(settings.proximityRadius))m. Nearest: \(closest.name) (\(dist)m away)."
+                    detail = "GPS accuracy (±\(Int(accuracy))m) exceeds radius (\(Int(settings.proximityRadius))m). Nearest: \(closest.name) (\(dist)m). Proximity skipped."
                 } else {
-                    detail = "No stations within \(Int(settings.proximityRadius))m."
+                    detail = "GPS accuracy (±\(Int(accuracy))m) exceeds radius (\(Int(settings.proximityRadius))m). Proximity skipped."
                 }
                 proximityResult = (false, detail)
             } else {
-                // Check station filter
-                let matchingStations: [MetroStation]
-                switch settings.proximityStationFilter {
-                case .all:
-                    matchingStations = stationsInRange
-                case .selected(let names):
-                    matchingStations = stationsInRange.filter { names.contains($0.name) }
+                let stationsInRange = allStations.filter {
+                    ($0.distance(from: location) + accuracy) <= settings.proximityRadius
                 }
 
-                if matchingStations.isEmpty {
-                    let inRangeNames = stationsInRange.map(\.name).joined(separator: ", ")
-                    proximityResult = (false, "Stations in range (\(inRangeNames)) are not in your selected filter.")
+                if stationsInRange.isEmpty {
+                    let closest = allStations.min { $0.distance(from: location) < $1.distance(from: location) }
+                    let detail: String
+                    if let closest {
+                        let dist = Int(closest.distance(from: location))
+                        detail = "No stations within \(Int(settings.proximityRadius))m (±\(Int(accuracy))m accuracy). Nearest: \(closest.name) (\(dist)m away)."
+                    } else {
+                        detail = "No stations within \(Int(settings.proximityRadius))m."
+                    }
+                    proximityResult = (false, detail)
                 } else {
-                    let names = matchingStations.map(\.name).joined(separator: ", ")
-                    proximityResult = (true, "Near: \(names)")
+                    let matchingStations: [MetroStation]
+                    switch settings.proximityStationFilter {
+                    case .all:
+                        matchingStations = stationsInRange
+                    case .selected(let names):
+                        matchingStations = stationsInRange.filter { names.contains($0.name) }
+                    }
+
+                    if matchingStations.isEmpty {
+                        let inRangeNames = stationsInRange.map(\.name).joined(separator: ", ")
+                        proximityResult = (false, "Stations in range (\(inRangeNames)) are not in your selected filter.")
+                    } else {
+                        let names = matchingStations.map(\.name).joined(separator: ", ")
+                        proximityResult = (true, "Near: \(names)")
+                    }
                 }
             }
         } else {

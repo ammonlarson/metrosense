@@ -50,9 +50,15 @@ struct ContentView: View {
             Text("Degraded GPS accuracy")
                 .font(.footnote.bold())
             Spacer()
-            Text("Location may be imprecise")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+            if let accuracy = viewModel.currentLocation?.horizontalAccuracy {
+                Text("±\(Int(accuracy))m")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Location may be imprecise")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(10)
         .background(.yellow.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))

@@ -32,6 +32,17 @@ extension MetroStation {
     func isNearby(_ location: CLLocation) -> Bool {
         distance(from: location) <= MetroStation.proximityRadius
     }
+
+    /// Accuracy-aware proximity check. When the GPS accuracy circle extends
+    /// beyond the proximity radius the station cannot be reliably confirmed,
+    /// so the check returns `false`.
+    func isNearby(_ location: CLLocation, accuracy: CLLocationDistance) -> Bool {
+        let dist = distance(from: location)
+        // The true position lies within `accuracy` meters of the reported
+        // coordinate. Require that even the worst-case offset still falls
+        // inside the proximity radius.
+        return (dist + accuracy) <= MetroStation.proximityRadius
+    }
 }
 
 // MARK: - Station Catalog
