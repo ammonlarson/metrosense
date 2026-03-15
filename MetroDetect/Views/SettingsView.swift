@@ -4,6 +4,7 @@ import CoreLocation
 struct SettingsView: View {
     @State private var settings: NotificationSettings
     @State private var testResult: NotificationTestResult?
+    @State private var testRunCount: Int = 0
     @Environment(\.dismiss) private var dismiss
 
     private let allStationNames: [String]
@@ -148,10 +149,12 @@ struct SettingsView: View {
     private var testSection: some View {
         Section {
             Button {
+                testRunCount += 1
                 testResult = NotificationTestResult.evaluate(
                     settings: settings,
                     location: currentLocation,
-                    speed: currentSpeed
+                    speed: currentSpeed,
+                    runNumber: testRunCount
                 )
             } label: {
                 Label("Test Notifications Now", systemImage: "bell.badge")
@@ -159,6 +162,18 @@ struct SettingsView: View {
             .disabled(!settings.isValid)
 
             if let result = testResult {
+                HStack {
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundStyle(.secondary)
+                    Text("Run #\(result.runNumber)")
+                        .font(.subheadline.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(result.timestamp, style: .time)
+                        .font(.subheadline.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+
                 if result.proximityWouldFire {
                     Label {
                         VStack(alignment: .leading, spacing: 2) {
@@ -280,7 +295,9 @@ struct SettingsView: View {
 
 // MARK: - Notification Test Result
 
-struct NotificationTestResult {
+struct NotificationTestResult: Equatable {
+    let runNumber: Int
+    let timestamp: Date
     let proximityWouldFire: Bool
     let proximityDetail: String
     let movementWouldFire: Bool
@@ -289,7 +306,8 @@ struct NotificationTestResult {
     static func evaluate(
         settings: NotificationSettings,
         location: CLLocation?,
-        speed: Double
+        speed: Double,
+        runNumber: Int
     ) -> NotificationTestResult {
         // Evaluate proximity
         let proximityResult: (Bool, String)
@@ -350,6 +368,8 @@ struct NotificationTestResult {
         }
 
         return NotificationTestResult(
+            runNumber: runNumber,
+            timestamp: Date(),
             proximityWouldFire: proximityResult.0,
             proximityDetail: proximityResult.1,
             movementWouldFire: movementResult.0,
