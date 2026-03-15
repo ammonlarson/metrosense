@@ -7,6 +7,7 @@ final class MetroViewModel: ObservableObject {
     @Published var tripState: MetroTripState = .idle
     @Published var nearestStation: MetroStation?
     @Published var speedKMH: Double = 0
+    @Published var isUsingDegradedLocation: Bool = false
     @Published var settings: NotificationSettings
 
     var currentLocation: CLLocation? { locationService.currentLocation }
@@ -42,6 +43,10 @@ final class MetroViewModel: ObservableObject {
                 self?.evaluate(location: location, speed: speed)
             }
             .store(in: &cancellables)
+
+        locationService.$isUsingDegradedLocation
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$isUsingDegradedLocation)
     }
 
     private func evaluate(location: CLLocation, speed: Double) {

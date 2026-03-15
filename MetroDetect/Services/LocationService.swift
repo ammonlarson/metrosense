@@ -5,6 +5,7 @@ final class LocationService: NSObject, ObservableObject {
     @Published var currentLocation: CLLocation?
     @Published var currentSpeed: Double = 0  // m/s
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published var isUsingDegradedLocation: Bool = false
     @Published var error: String?
 
     private static let accuracyThreshold: Double = 200
@@ -66,8 +67,10 @@ extension LocationService: CLLocationManagerDelegate {
         } ?? true
 
         let withinFallback = location.horizontalAccuracy <= Self.fallbackAccuracyThreshold
-        guard !isStale, (!isTooInaccurate || (currentIsStale && withinFallback)) else { return }
+        let usingFallback = isTooInaccurate && currentIsStale && withinFallback
+        guard !isStale, (!isTooInaccurate || usingFallback) else { return }
 
+        isUsingDegradedLocation = usingFallback
         currentLocation = location
         // CLLocation.speed is -1 when unavailable; clamp to 0
         currentSpeed = max(0, location.speed)
