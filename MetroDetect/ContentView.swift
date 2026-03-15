@@ -7,6 +7,9 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 24) {
+                if viewModel.isUsingDegradedLocation {
+                    degradedLocationBanner
+                }
                 statusCard
                 speedCard
                 stationCard
@@ -39,6 +42,21 @@ struct ContentView: View {
     }
 
     // MARK: - Subviews
+
+    private var degradedLocationBanner: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "location.slash.circle.fill")
+                .foregroundStyle(.yellow)
+            Text("Degraded GPS accuracy")
+                .font(.footnote.bold())
+            Spacer()
+            Text("Location may be imprecise")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .padding(10)
+        .background(.yellow.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
+    }
 
     private var statusCard: some View {
         VStack(spacing: 8) {
