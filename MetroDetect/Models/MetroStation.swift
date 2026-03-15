@@ -1,22 +1,33 @@
 import CoreLocation
 
-struct MetroStation: Identifiable, Equatable {
+struct MetroStation: Identifiable, Equatable, Hashable {
     var id: String { name }
     let name: String
     let coordinate: CLLocationCoordinate2D
 
     /// Lines serving this station, derived from MetroLine definitions.
     var lines: [MetroLine.LineID] {
-        MetroLine.all
+        let serving = MetroLine.all
             .filter { line in line.stations.contains(self) }
             .map(\.id)
+        precondition(!serving.isEmpty, "Station '\(name)' is not on any metro line")
+        return serving
     }
 
     // Radius (meters) within which we consider the user to be "at" this station
     static let proximityRadius: CLLocationDistance = 150
 
+    private init(name: String, coordinate: CLLocationCoordinate2D) {
+        self.name = name
+        self.coordinate = coordinate
+    }
+
     static func == (lhs: MetroStation, rhs: MetroStation) -> Bool {
         lhs.name == rhs.name
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(name)
     }
 }
 
