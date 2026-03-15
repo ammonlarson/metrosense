@@ -255,6 +255,10 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                 }
 
+                Text("\(String(format: "%.1f", settings.minimumSpeedMPS * 3.6)) km/h")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
                 HStack {
                     Text("Max Speed")
                     Spacer()
@@ -265,6 +269,10 @@ struct SettingsView: View {
                     Text("m/s")
                         .foregroundStyle(.secondary)
                 }
+
+                Text("\(String(format: "%.1f", settings.maximumSpeedMPS * 3.6)) km/h")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
 
                 if settings.minimumSpeedMPS > settings.maximumSpeedMPS {
                     Text("Min speed must not exceed max speed.")
