@@ -53,7 +53,10 @@ final class MetroViewModel: ObservableObject {
         speedKMH = speed * 3.6
 
         let accuracy = location.horizontalAccuracy
-        let nearby = nearbyStation(for: location, accuracy: accuracy)
+        // Use accuracy-aware check for proximity notifications (avoid false alerts)
+        // but use the standard check for trip state transitions (avoid missing
+        // arrivals when GPS is degraded underground).
+        let nearby = nearbyStation(for: location)
         nearestStation = nearby
 
         // Send proximity notifications using the user's configured radius.
@@ -174,10 +177,10 @@ final class MetroViewModel: ObservableObject {
         speed >= settings.minimumSpeedMPS && speed <= settings.maximumSpeedMPS
     }
 
-    private func nearbyStation(for location: CLLocation, accuracy: CLLocationDistance) -> MetroStation? {
+    private func nearbyStation(for location: CLLocation) -> MetroStation? {
         let allStations = MetroLine.all.flatMap { $0.stations }
         return allStations
-            .filter { $0.isNearby(location, accuracy: accuracy) }
+            .filter { $0.isNearby(location) }
             .min { $0.distance(from: location) < $1.distance(from: location) }
     }
 
