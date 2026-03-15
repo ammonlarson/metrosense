@@ -71,6 +71,7 @@ extension LocationService: CLLocationManagerDelegate {
         guard !isStale, (!isTooInaccurate || usingFallback) else { return }
 
         isUsingDegradedLocation = usingFallback
+        error = nil
         currentLocation = location
         // CLLocation.speed is -1 when unavailable; clamp to 0
         currentSpeed = max(0, location.speed)
