@@ -33,6 +33,18 @@ struct NotificationSettings: Equatable, Codable {
         requireStartAtStation: false
     )
 
+    // MARK: - km/h Convenience
+
+    var minimumSpeedKMH: Double {
+        get { minimumSpeedMPS * 3.6 }
+        set { minimumSpeedMPS = newValue / 3.6 }
+    }
+
+    var maximumSpeedKMH: Double {
+        get { maximumSpeedMPS * 3.6 }
+        set { maximumSpeedMPS = newValue / 3.6 }
+    }
+
     // MARK: - Validation
 
     var isValid: Bool {

@@ -247,32 +247,24 @@ struct SettingsView: View {
                 HStack {
                     Text("Min Speed")
                     Spacer()
-                    TextField("m/s", value: $settings.minimumSpeedMPS, format: .number)
+                    TextField("km/h", value: $settings.minimumSpeedKMH, format: .number)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
-                    Text("m/s")
+                    Text("km/h")
                         .foregroundStyle(.secondary)
                 }
-
-                Text("\(String(format: "%.1f", settings.minimumSpeedMPS * 3.6)) km/h")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
 
                 HStack {
                     Text("Max Speed")
                     Spacer()
-                    TextField("m/s", value: $settings.maximumSpeedMPS, format: .number)
+                    TextField("km/h", value: $settings.maximumSpeedKMH, format: .number)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .frame(width: 80)
-                    Text("m/s")
+                    Text("km/h")
                         .foregroundStyle(.secondary)
                 }
-
-                Text("\(String(format: "%.1f", settings.maximumSpeedMPS * 3.6)) km/h")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
 
                 if settings.minimumSpeedMPS > settings.maximumSpeedMPS {
                     Text("Min speed must not exceed max speed.")
