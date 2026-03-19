@@ -5,6 +5,7 @@ struct SettingsView: View {
     @State private var settings: NotificationSettings
     @State private var testResult: NotificationTestResult?
     @State private var testRunCount: Int = 0
+    @State private var isStationListExpanded: Bool = true
     @Environment(\.dismiss) private var dismiss
 
     private let allStationNames: [String]
@@ -101,20 +102,25 @@ struct SettingsView: View {
                         .foregroundStyle(.red)
                 }
 
-                ForEach(allStationNames, id: \.self) { name in
-                    Button {
-                        toggleStation(name, in: selected)
-                    } label: {
-                        HStack {
-                            Text(name)
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            if selected.contains(name) {
-                                Image(systemName: "checkmark")
-                                    .foregroundStyle(.blue)
+                DisclosureGroup(isExpanded: $isStationListExpanded) {
+                    ForEach(allStationNames, id: \.self) { name in
+                        Button {
+                            toggleStation(name, in: selected)
+                        } label: {
+                            HStack {
+                                Text(name)
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if selected.contains(name) {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(.blue)
+                                }
                             }
                         }
                     }
+                } label: {
+                    Text("\(selected.count) of \(allStationNames.count) stations selected")
+                        .foregroundStyle(.secondary)
                 }
             }
         }
