@@ -443,8 +443,8 @@ struct NotificationTestResult: Equatable {
                 cooldownElapsed = true
             }
 
-            if !cooldownElapsed {
-                movementResult = (false, "Speed \(speedKMH) km/h is within range but suppressed by cooldown.\(cooldownNote)")
+            if inRange && !cooldownElapsed {
+                movementResult = (false, "Speed \(speedKMH) km/h is within metro range but suppressed by cooldown.\(cooldownNote)")
             } else if inRange {
                 movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h).")
             } else if speed < settings.minimumSpeedMPS {
