@@ -5,7 +5,7 @@ struct SettingsView: View {
     @State private var settings: NotificationSettings
     @State private var testResult: NotificationTestResult?
     @State private var testRunCount: Int = 0
-    @State private var isStationListExpanded: Bool = true
+    @State private var isStationListExpanded: Bool = false
     @Environment(\.dismiss) private var dismiss
 
     private let allStationNames: [String]
