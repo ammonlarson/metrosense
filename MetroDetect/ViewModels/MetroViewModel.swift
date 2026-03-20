@@ -20,6 +20,7 @@ final class MetroViewModel: ObservableObject {
     private var departureStation: MetroStation?
     private var hasNotifiedCurrentTrip = false
     private var metroSpeedStartTime: Date?
+    private(set) var lastMovementNotificationTime: Date?
 
     /// Maximum distance (meters) for showing the nearest station on the home screen.
     private static let nearestStationMaxDistance: CLLocationDistance = 10_000
@@ -111,8 +112,9 @@ final class MetroViewModel: ObservableObject {
                    let line = likelyLine(near: location, from: departure) {
                     departureStation = departure
                     tripState = .onMetro(line: line, fromStation: departure, speed: speed)
-                    if !hasNotifiedCurrentTrip && settings.movementEnabled {
+                    if !hasNotifiedCurrentTrip && settings.movementEnabled && isMovementCooldownElapsed() {
                         hasNotifiedCurrentTrip = true
+                        lastMovementNotificationTime = Date()
                         NotificationService.shared.sendMetroDetected(
                             line: line.rawValue,
                             fromStation: departure.name
@@ -176,6 +178,12 @@ final class MetroViewModel: ObservableObject {
             trigger: nil
         )
         UNUserNotificationCenter.current().add(request)
+    }
+
+    private func isMovementCooldownElapsed() -> Bool {
+        guard settings.movementCooldownSeconds > 0 else { return true }
+        guard let lastTime = lastMovementNotificationTime else { return true }
+        return Date().timeIntervalSince(lastTime) >= settings.movementCooldownSeconds
     }
 
     private func isMetroSpeed(_ speed: Double) -> Bool {

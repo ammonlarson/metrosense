@@ -19,6 +19,7 @@ struct NotificationSettings: Equatable, Codable {
     var maximumSpeedMPS: Double
     var sustainedDurationSeconds: TimeInterval
     var requireStartAtStation: Bool
+    var movementCooldownMinutes: Double
 
     // MARK: - Defaults
 
@@ -30,7 +31,8 @@ struct NotificationSettings: Equatable, Codable {
         minimumSpeedMPS: 40.0 / 3.6,
         maximumSpeedMPS: 90.0 / 3.6,
         sustainedDurationSeconds: 0,
-        requireStartAtStation: false
+        requireStartAtStation: false,
+        movementCooldownMinutes: 60
     )
 
     // MARK: - km/h Convenience
@@ -45,6 +47,10 @@ struct NotificationSettings: Equatable, Codable {
         set { maximumSpeedMPS = newValue / 3.6 }
     }
 
+    var movementCooldownSeconds: TimeInterval {
+        movementCooldownMinutes * 60
+    }
+
     // MARK: - Validation
 
     var isValid: Bool {
@@ -53,6 +59,7 @@ struct NotificationSettings: Equatable, Codable {
             && maximumSpeedMPS > 0
             && minimumSpeedMPS <= maximumSpeedMPS
             && sustainedDurationSeconds >= 0
+            && movementCooldownMinutes >= 0
             && {
                 if case .selected(let stations) = proximityStationFilter {
                     return !stations.isEmpty

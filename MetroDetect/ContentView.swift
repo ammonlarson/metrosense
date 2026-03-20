@@ -29,7 +29,8 @@ struct ContentView: View {
                 SettingsView(
                     settings: viewModel.settings,
                     currentLocation: viewModel.currentLocation,
-                    currentSpeed: viewModel.currentSpeed
+                    currentSpeed: viewModel.currentSpeed,
+                    lastMovementNotificationTime: viewModel.lastMovementNotificationTime
                 ) { newSettings in
                     newSettings.save()
                     viewModel.settings = newSettings
