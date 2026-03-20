@@ -6,6 +6,8 @@ struct SettingsView: View {
     @State private var testResult: NotificationTestResult?
     @State private var testRunCount: Int = 0
     @State private var isStationListExpanded: Bool = false
+    @State private var stationDisplayOrder: [String] = []
+    @State private var lastSelectedStations: Set<String> = []
     @Environment(\.dismiss) private var dismiss
 
     private let allStationNames: [String]
@@ -35,6 +37,11 @@ struct SettingsView: View {
             }
         }
         allStationNames = names.sorted()
+        _stationDisplayOrder = State(initialValue: names.sorted())
+
+        if case .selected(let stations) = settings.proximityStationFilter {
+            _lastSelectedStations = State(initialValue: stations)
+        }
     }
 
     var body: some View {
@@ -102,8 +109,8 @@ struct SettingsView: View {
                         .foregroundStyle(.red)
                 }
 
-                DisclosureGroup(isExpanded: $isStationListExpanded) {
-                    ForEach(allStationNames, id: \.self) { name in
+                DisclosureGroup(isExpanded: stationListExpandedBinding) {
+                    ForEach(stationDisplayOrder, id: \.self) { name in
                         Button {
                             toggleStation(name, in: selected)
                         } label: {
@@ -133,9 +140,15 @@ struct SettingsView: View {
                 return false
             },
             set: { isAll in
-                settings.proximityStationFilter = isAll
-                    ? .all
-                    : .selected(Set())
+                if isAll {
+                    if case .selected(let current) = settings.proximityStationFilter {
+                        lastSelectedStations = current
+                    }
+                    isStationListExpanded = false
+                    settings.proximityStationFilter = .all
+                } else {
+                    settings.proximityStationFilter = .selected(lastSelectedStations)
+                }
             }
         )
     }
@@ -148,6 +161,25 @@ struct SettingsView: View {
             updated.insert(name)
         }
         settings.proximityStationFilter = .selected(updated)
+        lastSelectedStations = updated
+    }
+
+    private func computeDisplayOrder(selected: Set<String>) -> [String] {
+        let selectedNames = allStationNames.filter { selected.contains($0) }
+        let unselectedNames = allStationNames.filter { !selected.contains($0) }
+        return selectedNames + unselectedNames
+    }
+
+    private var stationListExpandedBinding: Binding<Bool> {
+        Binding(
+            get: { isStationListExpanded },
+            set: { newValue in
+                if newValue, case .selected(let selected) = settings.proximityStationFilter {
+                    stationDisplayOrder = computeDisplayOrder(selected: selected)
+                }
+                isStationListExpanded = newValue
+            }
+        )
     }
 
     // MARK: - Test Section
