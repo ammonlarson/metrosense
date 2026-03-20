@@ -144,6 +144,7 @@ struct SettingsView: View {
                     if case .selected(let current) = settings.proximityStationFilter {
                         lastSelectedStations = current
                     }
+                    isStationListExpanded = false
                     settings.proximityStationFilter = .all
                 } else {
                     settings.proximityStationFilter = .selected(lastSelectedStations)
