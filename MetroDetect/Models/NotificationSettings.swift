@@ -18,7 +18,7 @@ struct NotificationSettings: Equatable, Codable {
     var minimumSpeedMPS: Double
     var maximumSpeedMPS: Double
     var sustainedDurationSeconds: TimeInterval
-    var requireStartAtStation: Bool
+    var requireStartAtStationFilter: StationFilter?
     var movementCooldownMinutes: Double
 
     // MARK: - Defaults
@@ -31,7 +31,7 @@ struct NotificationSettings: Equatable, Codable {
         minimumSpeedMPS: 40.0 / 3.6,
         maximumSpeedMPS: 90.0 / 3.6,
         sustainedDurationSeconds: 0,
-        requireStartAtStation: false,
+        requireStartAtStationFilter: nil,
         movementCooldownMinutes: 60
     )
 
@@ -45,6 +45,17 @@ struct NotificationSettings: Equatable, Codable {
     var maximumSpeedKMH: Double {
         get { maximumSpeedMPS * 3.6 }
         set { maximumSpeedMPS = newValue / 3.6 }
+    }
+
+    var requireStartAtStation: Bool {
+        get { requireStartAtStationFilter != nil }
+        set {
+            if newValue {
+                requireStartAtStationFilter = requireStartAtStationFilter ?? .all
+            } else {
+                requireStartAtStationFilter = nil
+            }
+        }
     }
 
     var movementCooldownSeconds: TimeInterval {
@@ -66,12 +77,31 @@ struct NotificationSettings: Equatable, Codable {
                 }
                 return true
             }()
+            && {
+                if case .selected(let stations) = requireStartAtStationFilter {
+                    return !stations.isEmpty
+                }
+                return true
+            }()
     }
 }
 
 // MARK: - Codable
 
 extension NotificationSettings {
+    private enum CodingKeys: String, CodingKey {
+        case proximityEnabled
+        case proximityRadius
+        case proximityStationFilter
+        case movementEnabled
+        case minimumSpeedMPS
+        case maximumSpeedMPS
+        case sustainedDurationSeconds
+        case requireStartAtStationFilter
+        case requireStartAtStation // legacy key for backward compat
+        case movementCooldownMinutes
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         proximityEnabled = try container.decode(Bool.self, forKey: .proximityEnabled)
@@ -81,8 +111,28 @@ extension NotificationSettings {
         minimumSpeedMPS = try container.decode(Double.self, forKey: .minimumSpeedMPS)
         maximumSpeedMPS = try container.decode(Double.self, forKey: .maximumSpeedMPS)
         sustainedDurationSeconds = try container.decode(TimeInterval.self, forKey: .sustainedDurationSeconds)
-        requireStartAtStation = try container.decode(Bool.self, forKey: .requireStartAtStation)
+        // Backward compatibility: previously stored as Bool, now StationFilter?
+        if let filter = try? container.decodeIfPresent(StationFilter.self, forKey: .requireStartAtStationFilter) {
+            requireStartAtStationFilter = filter
+        } else if let legacy = try? container.decodeIfPresent(Bool.self, forKey: .requireStartAtStation) {
+            requireStartAtStationFilter = legacy ? .all : nil
+        } else {
+            requireStartAtStationFilter = nil
+        }
         movementCooldownMinutes = try container.decodeIfPresent(Double.self, forKey: .movementCooldownMinutes) ?? 60
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(proximityEnabled, forKey: .proximityEnabled)
+        try container.encode(proximityRadius, forKey: .proximityRadius)
+        try container.encode(proximityStationFilter, forKey: .proximityStationFilter)
+        try container.encode(movementEnabled, forKey: .movementEnabled)
+        try container.encode(minimumSpeedMPS, forKey: .minimumSpeedMPS)
+        try container.encode(maximumSpeedMPS, forKey: .maximumSpeedMPS)
+        try container.encode(sustainedDurationSeconds, forKey: .sustainedDurationSeconds)
+        try container.encodeIfPresent(requireStartAtStationFilter, forKey: .requireStartAtStationFilter)
+        try container.encode(movementCooldownMinutes, forKey: .movementCooldownMinutes)
     }
 }
 

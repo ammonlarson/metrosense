@@ -102,9 +102,15 @@ final class MetroViewModel: ObservableObject {
                 let sustained = Date().timeIntervalSince(metroSpeedStartTime ?? Date())
                 guard sustained >= settings.sustainedDurationSeconds else { return }
 
-                // If requireStartAtStation is on, only trigger from a station
-                if settings.requireStartAtStation && departureStation == nil && nearby == nil {
-                    return
+                // If requireStartAtStation is on, only trigger from an applicable station
+                if let filter = settings.requireStartAtStationFilter {
+                    let candidate = departureStation ?? nearby
+                    switch filter {
+                    case .all:
+                        if candidate == nil { return }
+                    case .selected(let names):
+                        guard let station = candidate, names.contains(station.name) else { return }
+                    }
                 }
 
                 // Moving at metro speed — find the most likely line

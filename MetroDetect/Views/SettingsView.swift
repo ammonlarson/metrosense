@@ -8,6 +8,9 @@ struct SettingsView: View {
     @State private var isStationListExpanded: Bool = false
     @State private var stationDisplayOrder: [String] = []
     @State private var lastSelectedStations: Set<String> = []
+    @State private var isStartStationListExpanded: Bool = false
+    @State private var startStationDisplayOrder: [String] = []
+    @State private var lastSelectedStartStations: Set<String> = []
     @Environment(\.dismiss) private var dismiss
 
     private let allStationNames: [String]
@@ -41,9 +44,13 @@ struct SettingsView: View {
         }
         allStationNames = names.sorted()
         _stationDisplayOrder = State(initialValue: names.sorted())
+        _startStationDisplayOrder = State(initialValue: names.sorted())
 
         if case .selected(let stations) = settings.proximityStationFilter {
             _lastSelectedStations = State(initialValue: stations)
+        }
+        if case .selected(let stations) = settings.requireStartAtStationFilter {
+            _lastSelectedStartStations = State(initialValue: stations)
         }
     }
 
@@ -186,6 +193,90 @@ struct SettingsView: View {
                     stationDisplayOrder = computeDisplayOrder(selected: selected)
                 }
                 isStationListExpanded = newValue
+            }
+        )
+    }
+
+    // MARK: - Start Station Filter
+
+    private var startStationFilterPicker: some View {
+        Group {
+            Picker("Start Stations", selection: startStationFilterBinding) {
+                Text("All Stations").tag(true)
+                Text("Selected Stations").tag(false)
+            }
+
+            if case .selected(let selected) = settings.requireStartAtStationFilter {
+                if selected.isEmpty {
+                    Text("Select at least one station.")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+
+                DisclosureGroup(isExpanded: startStationListExpandedBinding) {
+                    ForEach(startStationDisplayOrder, id: \.self) { name in
+                        Button {
+                            toggleStartStation(name, in: selected)
+                        } label: {
+                            HStack {
+                                Text(name)
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if selected.contains(name) {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(.blue)
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    Text("\(selected.count) of \(allStationNames.count) stations selected")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private var startStationFilterBinding: Binding<Bool> {
+        Binding(
+            get: {
+                if case .all = settings.requireStartAtStationFilter { return true }
+                if case .selected = settings.requireStartAtStationFilter { return false }
+                return true
+            },
+            set: { isAll in
+                if isAll {
+                    if case .selected(let current) = settings.requireStartAtStationFilter {
+                        lastSelectedStartStations = current
+                    }
+                    isStartStationListExpanded = false
+                    settings.requireStartAtStationFilter = .all
+                } else {
+                    settings.requireStartAtStationFilter = .selected(lastSelectedStartStations)
+                }
+            }
+        )
+    }
+
+    private func toggleStartStation(_ name: String, in selected: Set<String>) {
+        var updated = selected
+        if updated.contains(name) {
+            updated.remove(name)
+        } else {
+            updated.insert(name)
+        }
+        settings.requireStartAtStationFilter = .selected(updated)
+        lastSelectedStartStations = updated
+    }
+
+    private var startStationListExpandedBinding: Binding<Bool> {
+        Binding(
+            get: { isStartStationListExpanded },
+            set: { newValue in
+                if newValue, case .selected(let selected) = settings.requireStartAtStationFilter {
+                    startStationDisplayOrder = computeDisplayOrder(selected: selected)
+                }
+                isStartStationListExpanded = newValue
             }
         )
     }
@@ -366,6 +457,10 @@ struct SettingsView: View {
                     Text("Only alert if movement began near a metro station.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+
+                if settings.requireStartAtStation {
+                    startStationFilterPicker
                 }
             }
         } header: {
