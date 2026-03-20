@@ -67,9 +67,10 @@ struct ContentView: View {
 
     private var statusCard: some View {
         VStack(spacing: 8) {
-            Image(systemName: tripStateIcon)
-                .font(.system(size: 56))
-                .foregroundStyle(tripStateColor)
+            Image(tripStateImageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 120, height: 120)
             Text(tripStateLabel)
                 .font(.title2.bold())
             Text(tripStateDetail)
@@ -109,12 +110,12 @@ struct ContentView: View {
 
     // MARK: - Helpers
 
-    private var tripStateIcon: String {
+    private var tripStateImageName: String {
         switch viewModel.tripState {
-        case .idle:               return "location.slash"
-        case .atStation:          return "tram.fill.tunnel"
-        case .onMetro:            return "tram.fill"
-        case .arrived:            return "mappin.circle.fill"
+        case .idle:
+            return "MetroNo"
+        case .atStation, .onMetro, .arrived:
+            return "MetroYes"
         }
     }
 
