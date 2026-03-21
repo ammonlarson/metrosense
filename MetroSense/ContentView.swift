@@ -5,9 +5,9 @@ struct ContentView: View {
 
     var body: some View {
         MapContentView(viewModel: viewModel) { newSettings in
+            viewModel.settings = newSettings
             if newSettings.isValid {
                 newSettings.save()
-                viewModel.settings = newSettings
             }
         }
         .onAppear {
