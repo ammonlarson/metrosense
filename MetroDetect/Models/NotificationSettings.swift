@@ -30,7 +30,7 @@ struct NotificationSettings: Equatable, Codable {
         movementEnabled: true,
         minimumSpeedMPS: 40.0 / 3.6,
         maximumSpeedMPS: 90.0 / 3.6,
-        sustainedDurationSeconds: 0,
+        sustainedDurationSeconds: 10,
         requireStartAtStationFilter: nil,
         movementCooldownMinutes: 60
     )

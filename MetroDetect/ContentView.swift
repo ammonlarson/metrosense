@@ -15,7 +15,6 @@ struct ContentView: View {
                 stationCard
             }
             .padding()
-            .navigationTitle("MetroDetect")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
