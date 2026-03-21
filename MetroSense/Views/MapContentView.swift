@@ -281,7 +281,7 @@ struct MapContentView: View {
         let overlayFraction = overlayScreenFraction
         // The visible area above the overlay is (1 - overlayFraction) of the screen.
         // Scale the map span so the content fits within that visible portion, then
-        // shift the center northward so the visible portion sits above the overlay.
+        // shift the center southward so markers render in the upper visible area.
         let visibleFraction = max(1 - overlayFraction, 0.3)
 
         if let station = viewModel.nearestStation {
@@ -302,7 +302,7 @@ struct MapContentView: View {
 
             let region = MKCoordinateRegion(
                 center: CLLocationCoordinate2D(
-                    latitude: (minLat + maxLat) / 2 + latOffset,
+                    latitude: (minLat + maxLat) / 2 - latOffset,
                     longitude: (minLon + maxLon) / 2
                 ),
                 span: MKCoordinateSpan(
@@ -322,7 +322,7 @@ struct MapContentView: View {
                 cameraPosition = .region(
                     MKCoordinateRegion(
                         center: CLLocationCoordinate2D(
-                            latitude: userCoord.latitude + latOffset,
+                            latitude: userCoord.latitude - latOffset,
                             longitude: userCoord.longitude
                         ),
                         span: MKCoordinateSpan(latitudeDelta: mapSpanLat, longitudeDelta: contentLat)
