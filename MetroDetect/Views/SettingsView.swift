@@ -602,7 +602,41 @@ struct NotificationTestResult: Equatable {
             if inRange && !cooldownElapsed {
                 movementResult = (false, "Speed \(speedKMH) km/h is within metro range but suppressed by cooldown.\(cooldownNote)")
             } else if inRange {
-                movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h).")
+                // Check requireStartAtStationFilter before reporting positive
+                if let filter = settings.requireStartAtStationFilter {
+                    let allStations = MetroLine.all.flatMap { $0.stations }
+                    let nearbyStations: [MetroStation]
+                    if let loc = location {
+                        nearbyStations = allStations.filter { $0.isNearby(loc) }
+                    } else {
+                        nearbyStations = []
+                    }
+
+                    switch filter {
+                    case .all:
+                        if nearbyStations.isEmpty {
+                            movementResult = (false, "Speed \(speedKMH) km/h is within metro range but \"Require start at station\" is enabled and you are not near any station.")
+                        } else {
+                            let stationNames = nearbyStations.map(\.name).joined(separator: ", ")
+                            movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h). Near station: \(stationNames).")
+                        }
+                    case .selected(let names):
+                        let matching = nearbyStations.filter { names.contains($0.name) }
+                        if matching.isEmpty {
+                            if nearbyStations.isEmpty {
+                                movementResult = (false, "Speed \(speedKMH) km/h is within metro range but \"Require start at station\" is enabled with a station filter, and you are not near any station.")
+                            } else {
+                                let nearbyNames = nearbyStations.map(\.name).joined(separator: ", ")
+                                movementResult = (false, "Speed \(speedKMH) km/h is within metro range but nearby stations (\(nearbyNames)) are not in the required start-station filter.")
+                            }
+                        } else {
+                            let stationNames = matching.map(\.name).joined(separator: ", ")
+                            movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h). Near selected station: \(stationNames).")
+                        }
+                    }
+                } else {
+                    movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h).")
+                }
             } else if speed < settings.minimumSpeedMPS {
                 movementResult = (false, "Speed \(speedKMH) km/h is below minimum (\(String(format: "%.0f", settings.minimumSpeedKMH)) km/h).")
             } else {
