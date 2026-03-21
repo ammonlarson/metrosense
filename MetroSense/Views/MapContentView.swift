@@ -17,6 +17,7 @@ struct MapContentView: View {
 
     @State private var showingProximitySettings: Bool = false
     @State private var showingMovementSettings: Bool = false
+    @State private var showGearButton: Bool = true
     @State private var testResult: NotificationTestResult?
     @State private var isTesting: Bool = false
     @State private var testProgress: CGFloat = 0
@@ -303,11 +304,15 @@ struct MapContentView: View {
                             if settingsVisible {
                                 if projected > Self.snapThreshold {
                                     settingsVisible = false
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                                        showGearButton = true
+                                    }
                                 }
                             } else if overlayExpanded {
                                 if projected > Self.snapThreshold {
                                     overlayExpanded = false
                                 } else if projected < -Self.snapThreshold {
+                                    showGearButton = false
                                     settingsVisible = true
                                 }
                             } else {
@@ -334,6 +339,9 @@ struct MapContentView: View {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                             settingsVisible = false
                         }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                            showGearButton = true
+                        }
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title2)
@@ -341,9 +349,10 @@ struct MapContentView: View {
                             .padding(10)
                     }
                     .accessibilityLabel("Close settings")
-                    .transition(.opacity)
-                } else {
+                    .transition(.identity)
+                } else if showGearButton {
                     Button {
+                        showGearButton = false
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                             if !overlayExpanded {
                                 overlayExpanded = true
