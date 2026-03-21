@@ -20,10 +20,11 @@ struct SplashScreen: View {
 
                 Text("Copenhagen Metro Detection")
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(.white.opacity(0.85))
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color("IconBlue"))
+            .ignoresSafeArea()
             .task {
                 try? await Task.sleep(for: .seconds(1.5))
                 withAnimation(.easeOut(duration: 0.3)) {
