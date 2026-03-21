@@ -103,6 +103,7 @@ final class MetroViewModel: ObservableObject {
                 guard sustained >= settings.sustainedDurationSeconds else { return }
 
                 // If requireStartAtStation is on, only trigger from an applicable station
+                // and only when moving toward a neighboring station
                 if let filter = settings.requireStartAtStationFilter {
                     let candidate = departureStation ?? nearby
                     switch filter {
@@ -110,6 +111,11 @@ final class MetroViewModel: ObservableObject {
                         if candidate == nil { return }
                     case .selected(let names):
                         guard let station = candidate, names.contains(station.name) else { return }
+                    }
+
+                    // Direction check: movement must head toward a neighboring station
+                    if let origin = candidate, !origin.isMovingTowardNeighbor(currentLocation: location) {
+                        return
                     }
                 }
 

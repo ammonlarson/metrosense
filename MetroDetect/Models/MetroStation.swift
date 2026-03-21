@@ -56,6 +56,70 @@ extension MetroStation {
     }
 }
 
+// MARK: - Neighbors
+
+extension MetroStation {
+    /// Returns the set of stations directly adjacent to this station across all metro lines.
+    /// Adjacency is derived from station ordering in each `MetroLine` definition.
+    static func neighbors(of station: MetroStation) -> Set<MetroStation> {
+        var result = Set<MetroStation>()
+        for line in MetroLine.all {
+            guard let index = line.stations.firstIndex(of: station) else { continue }
+            if index > 0 {
+                result.insert(line.stations[index - 1])
+            }
+            if index < line.stations.count - 1 {
+                result.insert(line.stations[index + 1])
+            }
+            // For circular lines, first and last stations are also neighbors
+            if line.isCircular, line.stations.count > 2 {
+                if index == 0 {
+                    result.insert(line.stations[line.stations.count - 1])
+                } else if index == line.stations.count - 1 {
+                    result.insert(line.stations[0])
+                }
+            }
+        }
+        return result
+    }
+
+    /// Bearing (degrees, 0 = north, clockwise) from this station to a target coordinate.
+    func bearing(to target: CLLocationCoordinate2D) -> Double {
+        let lat1 = coordinate.latitude * .pi / 180
+        let lat2 = target.latitude * .pi / 180
+        let dLon = (target.longitude - coordinate.longitude) * .pi / 180
+
+        let y = sin(dLon) * cos(lat2)
+        let x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon)
+        let bearing = atan2(y, x) * 180 / .pi
+        return bearing.truncatingRemainder(dividingBy: 360) + (bearing < 0 ? 360 : 0)
+    }
+
+    /// Maximum angle (degrees) between the bearing to the user and the bearing to a
+    /// neighbor for the movement to count as "toward" that neighbor. Generous to
+    /// account for GPS jitter underground and curved metro segments.
+    static let directionToleranceDegrees: Double = 90
+
+    /// Whether movement from this station toward a given location is roughly heading
+    /// toward any of the station's neighbors.
+    func isMovingTowardNeighbor(currentLocation: CLLocation) -> Bool {
+        let neighbors = MetroStation.neighbors(of: self)
+        guard !neighbors.isEmpty else { return false }
+
+        let bearingToUser = bearing(to: currentLocation.coordinate)
+
+        for neighbor in neighbors {
+            let bearingToNeighbor = bearing(to: neighbor.coordinate)
+            let diff = abs(bearingToUser - bearingToNeighbor)
+            let angleDiff = min(diff, 360 - diff)
+            if angleDiff <= Self.directionToleranceDegrees {
+                return true
+            }
+        }
+        return false
+    }
+}
+
 // MARK: - Station Catalog
 
 extension MetroStation {

@@ -10,8 +10,15 @@ struct MetroLine: Identifiable {
 
     let id: LineID
     let stations: [MetroStation]
+    let isCircular: Bool
 
     var name: String { id.rawValue }
+
+    init(id: LineID, stations: [MetroStation], isCircular: Bool = false) {
+        self.id = id
+        self.stations = stations
+        self.isCircular = isCircular
+    }
 }
 
 // MARK: - Copenhagen Metro Data
@@ -81,8 +88,7 @@ extension MetroLine {
         .vibenshusRunddel,
         .poulHenningsenPlads,
         .trianglen,
-
-    ])
+    ], isCircular: true)
 
     static let m4 = MetroLine(id: .m4, stations: [
         .orientkaj,
