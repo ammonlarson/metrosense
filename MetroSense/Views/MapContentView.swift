@@ -51,7 +51,7 @@ struct MapContentView: View {
         .mapControls {
             MapCompass()
         }
-        .ignoresSafeArea(edges: .top)
+        .ignoresSafeArea()
     }
 
     private var stationAnnotationView: some View {
