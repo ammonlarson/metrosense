@@ -10,7 +10,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     private let allStationNames: [String]
-    private let onSave: (NotificationSettings) -> Void
+    private let onSettingsChanged: (NotificationSettings) -> Void
     private let currentLocation: CLLocation?
     private let currentSpeed: Double
     private let lastMovementNotificationTime: Date?
@@ -20,10 +20,10 @@ struct SettingsView: View {
         currentLocation: CLLocation? = nil,
         currentSpeed: Double = 0,
         lastMovementNotificationTime: Date? = nil,
-        onSave: @escaping (NotificationSettings) -> Void = { $0.save() }
+        onSettingsChanged: @escaping (NotificationSettings) -> Void = { $0.save() }
     ) {
         _settings = State(initialValue: settings)
-        self.onSave = onSave
+        self.onSettingsChanged = onSettingsChanged
         self.currentLocation = currentLocation
         self.currentSpeed = currentSpeed
         self.lastMovementNotificationTime = lastMovementNotificationTime
@@ -51,15 +51,20 @@ struct SettingsView: View {
             .navigationTitle("Notification Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        onSave(settings)
+                    Button {
                         dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                            .font(.title2)
                     }
-                    .disabled(!settings.isValid)
+                    .accessibilityLabel("Close")
+                }
+            }
+            .onChange(of: settings) { _, newValue in
+                if newValue.isValid {
+                    onSettingsChanged(newValue)
                 }
             }
         }

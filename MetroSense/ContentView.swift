@@ -15,11 +15,12 @@ struct ContentView: View {
                 settings: viewModel.settings,
                 currentLocation: viewModel.currentLocation,
                 currentSpeed: viewModel.currentSpeed,
-                lastMovementNotificationTime: viewModel.lastMovementNotificationTime
-            ) { newSettings in
-                newSettings.save()
-                viewModel.settings = newSettings
-            }
+                lastMovementNotificationTime: viewModel.lastMovementNotificationTime,
+                onSettingsChanged: { newSettings in
+                    newSettings.save()
+                    viewModel.settings = newSettings
+                }
+            )
         }
         .onAppear {
             viewModel.start()
