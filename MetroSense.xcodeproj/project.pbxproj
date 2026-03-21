@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0C7DFAD6DA55C5CFA8BB04ED /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3DAA8333A89FEB3A9954DD6 /* ContentView.swift */; };
 		2D100B05B71F7D0BF9EDB78E /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DC1367451D3060AD2ADEAC /* NotificationService.swift */; };
+		2D50D1BC925E68EF3AAB4C0E /* MovementSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C154754907F423A6F5ECB3 /* MovementSettingsView.swift */; };
 		40D7299D802D58CD81088BB6 /* MetroTripState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B98CFDE82A93ADF8A57FCB /* MetroTripState.swift */; };
 		4FE4B7D5A619E9A3C255D02E /* MapContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C416A9690EA5DEBE5C4784 /* MapContentView.swift */; };
 		60466D3225B82933E5C98507 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE224E25AB5C6325640083 /* Assets.xcassets */; };
@@ -16,6 +17,7 @@
 		A3270A9E3DBDF7B9D145F2FA /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B764777F71F980FF1A1C6979 /* SplashScreen.swift */; };
 		A6285064E544E4C9C9F2A585 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76AE715724C3018308461364 /* LocationService.swift */; };
 		ACF3D20FDB85920502E664CA /* MetroSenseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B860E1311A218F9535E0D19 /* MetroSenseApp.swift */; };
+		BDEA8D9D10B51FD3CB63E79E /* ProximitySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033B28468695ABC40411E0EF /* ProximitySettingsView.swift */; };
 		C4F154BC3A49FB5E2314FF35 /* MetroLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCADA81F1831CC5803DB2113 /* MetroLine.swift */; };
 		C628CB165B841562784910FB /* NotificationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE37611856ABD7622C0C3BA8 /* NotificationSettings.swift */; };
 		D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */; };
@@ -24,6 +26,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		033B28468695ABC40411E0EF /* ProximitySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProximitySettingsView.swift; sourceTree = "<group>"; };
+		06C154754907F423A6F5ECB3 /* MovementSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovementSettingsView.swift; sourceTree = "<group>"; };
 		20AEC0F64175BB303AD89638 /* MetroStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroStation.swift; sourceTree = "<group>"; };
 		43B98CFDE82A93ADF8A57FCB /* MetroTripState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroTripState.swift; sourceTree = "<group>"; };
 		4B860E1311A218F9535E0D19 /* MetroSenseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroSenseApp.swift; sourceTree = "<group>"; };
@@ -106,6 +110,8 @@
 			isa = PBXGroup;
 			children = (
 				E0C416A9690EA5DEBE5C4784 /* MapContentView.swift */,
+				06C154754907F423A6F5ECB3 /* MovementSettingsView.swift */,
+				033B28468695ABC40411E0EF /* ProximitySettingsView.swift */,
 				A46816E662033897D01B62A6 /* SettingsView.swift */,
 				B764777F71F980FF1A1C6979 /* SplashScreen.swift */,
 				BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */,
@@ -194,8 +200,10 @@
 				EB37E135E77FCACF2C70C068 /* MetroStation.swift in Sources */,
 				40D7299D802D58CD81088BB6 /* MetroTripState.swift in Sources */,
 				FE5E1C6BB9ABAD0DAD64FF26 /* MetroViewModel.swift in Sources */,
+				2D50D1BC925E68EF3AAB4C0E /* MovementSettingsView.swift in Sources */,
 				2D100B05B71F7D0BF9EDB78E /* NotificationService.swift in Sources */,
 				C628CB165B841562784910FB /* NotificationSettings.swift in Sources */,
+				BDEA8D9D10B51FD3CB63E79E /* ProximitySettingsView.swift in Sources */,
 				6FD5402AA4B21C8588F762FF /* SettingsView.swift in Sources */,
 				A3270A9E3DBDF7B9D145F2FA /* SplashScreen.swift in Sources */,
 				D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */,
