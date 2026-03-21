@@ -96,6 +96,10 @@ struct MapContentView: View {
             updateCamera()
         }
         .onChange(of: settingsVisible) {
+            if !settingsVisible {
+                testResult = nil
+                isTesting = false
+            }
             updateCamera()
         }
         .sheet(isPresented: $showingProximitySettings) {
