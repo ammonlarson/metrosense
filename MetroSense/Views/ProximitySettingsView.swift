@@ -39,3 +39,12 @@ struct ProximitySettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+#Preview {
+    NavigationStack {
+        ProximitySettingsView(
+            settings: .constant(.load()),
+            allStationNames: ["Kongens Nytorv", "Nørreport"]
+        )
+    }
+}

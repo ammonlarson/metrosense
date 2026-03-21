@@ -103,3 +103,12 @@ struct MovementSettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+#Preview {
+    NavigationStack {
+        MovementSettingsView(
+            settings: .constant(.load()),
+            allStationNames: ["Kongens Nytorv", "Nørreport"]
+        )
+    }
+}
