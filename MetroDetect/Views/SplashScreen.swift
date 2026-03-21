@@ -16,13 +16,14 @@ struct SplashScreen: View {
 
                 Text("MetroDetect")
                     .font(.largeTitle.bold())
+                    .foregroundStyle(.white)
 
                 Text("Copenhagen Metro Detection")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.8))
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(.systemBackground))
+            .background(Color("IconBlue"))
             .task {
                 try? await Task.sleep(for: .seconds(1.5))
                 withAnimation(.easeOut(duration: 0.3)) {
