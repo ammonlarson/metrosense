@@ -6,6 +6,7 @@ import UserNotifications
 final class MetroViewModel: ObservableObject {
     @Published var tripState: MetroTripState = .idle
     @Published var nearestStation: MetroStation?
+    @Published var nearestStationDistance: CLLocationDistance?
     @Published var speedKMH: Double = 0
     @Published var isUsingDegradedLocation: Bool = false
     @Published var settings: NotificationSettings
@@ -58,7 +59,9 @@ final class MetroViewModel: ObservableObject {
 
         let accuracy = location.horizontalAccuracy
         // Show the closest station within 10 km on the home screen.
-        nearestStation = closestStation(for: location)
+        let closest = closestStation(for: location)
+        nearestStation = closest?.station
+        nearestStationDistance = closest?.distance
 
         // Use accuracy-aware check for proximity notifications (avoid false alerts)
         // but use the standard check for trip state transitions (avoid missing
@@ -202,7 +205,7 @@ final class MetroViewModel: ObservableObject {
         speed >= settings.minimumSpeedMPS && speed <= settings.maximumSpeedMPS
     }
 
-    private func closestStation(for location: CLLocation) -> MetroStation? {
+    private func closestStation(for location: CLLocation) -> (station: MetroStation, distance: CLLocationDistance)? {
         let allStations = MetroLine.all.flatMap { $0.stations }
         var best: (station: MetroStation, distance: CLLocationDistance)?
         for station in allStations {
@@ -211,7 +214,7 @@ final class MetroViewModel: ObservableObject {
                 best = (station, dist)
             }
         }
-        return best?.station
+        return best
     }
 
     private func nearbyStation(for location: CLLocation) -> MetroStation? {

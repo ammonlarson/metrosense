@@ -101,8 +101,20 @@ struct ContentView: View {
             Label("Nearest Station", systemImage: "tram.fill")
                 .foregroundStyle(.secondary)
             Spacer()
-            Text(viewModel.nearestStation?.name ?? "—")
-                .font(.subheadline.bold())
+            if let station = viewModel.nearestStation {
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(station.name)
+                        .font(.subheadline.bold())
+                    if let distance = viewModel.nearestStationDistance {
+                        Text(formattedDistance(distance))
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } else {
+                Text("—")
+                    .font(.subheadline.bold())
+            }
         }
         .padding()
         .background(.quaternary, in: RoundedRectangle(cornerRadius: 12))
@@ -134,6 +146,14 @@ struct ContentView: View {
         case .atStation(let s):   return "At \(s.name)"
         case .onMetro(let l, _, _): return "On \(l.rawValue)"
         case .arrived(_, _, let to): return "Arrived at \(to.name)"
+        }
+    }
+
+    private func formattedDistance(_ meters: Double) -> String {
+        if meters < 1000 {
+            return String(format: "%.0f m", meters)
+        } else {
+            return String(format: "%.1f km", meters / 1000)
         }
     }
 
