@@ -10,11 +10,18 @@ struct MapContentView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             mapLayer
-            overlayCard
             if viewModel.isUsingDegradedLocation {
                 degradedBanner
             }
-            resetCameraButton
+            VStack(spacing: 12) {
+                HStack {
+                    Spacer()
+                    resetCameraButton
+                }
+                .padding(.horizontal, 16)
+                overlayCard
+            }
+            .padding(.bottom, 8)
         }
         .onChange(of: viewModel.nearestStation) {
             updateCamera()
@@ -81,52 +88,78 @@ struct MapContentView: View {
 
     // MARK: - Overlay Card
 
-    private var overlayCard: some View {
-        VStack(spacing: 0) {
-            Image(systemName: "tram.fill")
-                .font(.system(size: 36))
-                .foregroundStyle(.blue)
-                .padding(.top, 20)
-                .padding(.bottom, 12)
+    private var metroStatusImage: String {
+        switch viewModel.tripState {
+        case .idle, .atStation:
+            return "MetroNo"
+        case .onMetro, .arrived:
+            return "MetroYes"
+        }
+    }
 
-            VStack(spacing: 4) {
+    private var overlayCard: some View {
+        VStack(spacing: 10) {
+            // Main status card
+            VStack(spacing: 0) {
+                Image(metroStatusImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 100)
+                    .padding(.top, 20)
+                    .padding(.bottom, 12)
+
                 Text(tripStateLabel)
                     .font(.title2.bold())
                     .foregroundStyle(.primary)
+                    .padding(.bottom, 4)
 
                 Text(tripStateDetail)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                    .padding(.bottom, 20)
             }
-            .padding(.bottom, 16)
+            .frame(maxWidth: .infinity)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
 
-            Divider()
-                .padding(.horizontal)
+            // Speed card
+            HStack {
+                Image(systemName: "speedometer")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                Text("Speed")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(String(format: "%.0f km/h", viewModel.speedKMH))
+                    .font(.title3.monospacedDigit().bold())
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
 
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 6) {
-                    Image(systemName: "speedometer")
-                        .font(.caption)
+            // Nearest station card
+            HStack {
+                Image(systemName: "tram.fill")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                Text("Nearest Station")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(nearestStationLabel)
+                        .font(.title3.bold())
+                    Text(nearestStationDistance)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Text(String(format: "%.0f km/h", viewModel.speedKMH))
-                        .font(.subheadline.monospacedDigit().bold())
-                }
-
-                HStack(spacing: 6) {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text("\(nearestStationLabel) · \(nearestStationDistance)")
-                        .font(.subheadline.bold())
-                        .lineLimit(1)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 12)
-            .padding(.horizontal)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
-        .padding(.bottom, 8)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal, 16)
     }
 
@@ -157,24 +190,15 @@ struct MapContentView: View {
     // MARK: - Reset Camera Button
 
     private var resetCameraButton: some View {
-        VStack {
-            Spacer()
-            HStack {
-                Spacer()
-                Button {
-                    lastCameraUpdateLocation = nil
-                    updateCamera()
-                } label: {
-                    Image(systemName: "location.fill")
-                        .font(.body)
-                        .padding(10)
-                        .background(.ultraThinMaterial, in: Circle())
-                }
-                .padding(.trailing, 16)
-                .padding(.bottom, 16)
-            }
+        Button {
+            lastCameraUpdateLocation = nil
+            updateCamera()
+        } label: {
+            Image(systemName: "location.fill")
+                .font(.body)
+                .padding(10)
+                .background(.ultraThinMaterial, in: Circle())
         }
-
     }
 
     // MARK: - Camera
