@@ -5,11 +5,7 @@ struct ContentView: View {
     @State private var showingSettings = false
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            MapContentView(viewModel: viewModel)
-
-            settingsButton
-        }
+        MapContentView(viewModel: viewModel, showingSettings: $showingSettings)
         .sheet(isPresented: $showingSettings) {
             SettingsView(
                 settings: viewModel.settings,
@@ -24,23 +20,6 @@ struct ContentView: View {
         }
         .onAppear {
             viewModel.start()
-        }
-    }
-
-    private var settingsButton: some View {
-        GeometryReader { proxy in
-            Button {
-                showingSettings = true
-            } label: {
-                Image(systemName: "gearshape.fill")
-                    .font(.body)
-                    .padding(10)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
-            .position(
-                x: proxy.size.width - 32,
-                y: proxy.safeAreaInsets.top + 24
-            )
         }
     }
 }

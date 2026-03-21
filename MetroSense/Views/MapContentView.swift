@@ -3,6 +3,7 @@ import MapKit
 
 struct MapContentView: View {
     @ObservedObject var viewModel: MetroViewModel
+    @Binding var showingSettings: Bool
     @State private var cameraPosition: MapCameraPosition = .automatic
     @State private var pulseScale: CGFloat = 1.0
     @State private var lastCameraUpdateLocation: CLLocation?
@@ -138,7 +139,7 @@ struct MapContentView: View {
             let clampedDrag = min(max(dragOffset + baseOffset, 0), collapseOffset)
 
             VStack(spacing: 0) {
-                dragHandle
+                overlayHeader
 
                 Image(metroStatusImage)
                     .resizable()
@@ -222,6 +223,24 @@ struct MapContentView: View {
         }
         .clipped()
         .frame(height: totalOverlayHeight)
+    }
+
+    private var overlayHeader: some View {
+        ZStack {
+            dragHandle
+            HStack {
+                Spacer()
+                Button {
+                    showingSettings = true
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                        .padding(10)
+                }
+            }
+            .padding(.trailing, 8)
+        }
     }
 
     private var dragHandle: some View {
@@ -394,5 +413,5 @@ struct MapContentView: View {
 }
 
 #Preview {
-    MapContentView(viewModel: MetroViewModel())
+    MapContentView(viewModel: MetroViewModel(), showingSettings: .constant(false))
 }
