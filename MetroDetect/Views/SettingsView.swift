@@ -312,7 +312,7 @@ struct SettingsView: View {
                                     )
                                 )
                                 .frame(width: geometry.size.width * testProgress)
-                                .animation(.linear(duration: 1.6), value: testProgress)
+                                .animation(.linear(duration: 1.05), value: testProgress)
                         }
                     }
                     .frame(height: 12)
