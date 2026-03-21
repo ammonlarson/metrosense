@@ -7,7 +7,7 @@ struct MapContentView: View {
     @State private var pulseScale: CGFloat = 1.0
     @State private var lastCameraUpdateLocation: CLLocation?
 
-    @AppStorage("overlayExpanded") private var overlayExpanded: Bool = true
+    @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
     @State private var dragOffset: CGFloat = 0
 
     /// Height of the collapsed portion that stays visible (drag handle + status image area).
@@ -193,7 +193,6 @@ struct MapContentView: View {
                         }
                     }
             )
-            .animation(.spring(response: 0.35, dampingFraction: 0.8), value: overlayExpanded)
         }
         .clipped()
         .frame(height: 340)
@@ -201,15 +200,13 @@ struct MapContentView: View {
     }
 
     private var dragHandle: some View {
-        VStack(spacing: 0) {
-            Capsule()
-                .fill(.secondary.opacity(0.5))
-                .frame(width: 36, height: 5)
-                .padding(.top, 8)
-                .padding(.bottom, 4)
-        }
-        .frame(maxWidth: .infinity)
-        .contentShape(Rectangle())
+        Capsule()
+            .fill(.secondary.opacity(0.5))
+            .frame(width: 36, height: 5)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
     }
 
     // MARK: - Degraded Banner
