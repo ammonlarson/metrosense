@@ -10,8 +10,8 @@ struct MapContentView: View {
     @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
     @State private var dragOffset: CGFloat = 0
 
-    /// Height of the collapsed portion that stays visible (drag handle + status image area).
-    private static let collapsedVisibleHeight: CGFloat = 160
+    /// Height of the collapsed portion that stays visible (drag handle + status icon only).
+    private static let collapsedVisibleHeight: CGFloat = 130
     /// Threshold to trigger a snap when dragging.
     private static let snapThreshold: CGFloat = 80
 
