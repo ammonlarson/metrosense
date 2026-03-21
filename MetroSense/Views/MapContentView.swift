@@ -9,27 +9,40 @@ struct MapContentView: View {
 
     @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
     @State private var dragOffset: CGFloat = 0
+    @State private var screenHeight: CGFloat = 0
 
     /// Height of the collapsed portion that stays visible (drag handle + status icon only).
     private static let collapsedVisibleHeight: CGFloat = 130
+    /// Full overlay card height.
+    private static let overlayFullHeight: CGFloat = 340
     /// Threshold to trigger a snap when dragging.
     private static let snapThreshold: CGFloat = 80
+    /// Bottom padding below the overlay card.
+    private static let overlayBottomPadding: CGFloat = 8
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            mapLayer
-            if viewModel.isUsingDegradedLocation {
-                degradedBanner
-            }
-            VStack(spacing: 12) {
-                HStack {
-                    Spacer()
-                    resetCameraButton
+        GeometryReader { geometry in
+            ZStack(alignment: .bottom) {
+                mapLayer
+                if viewModel.isUsingDegradedLocation {
+                    degradedBanner
                 }
-                .padding(.horizontal, 16)
-                overlayCard
+                VStack(spacing: 12) {
+                    HStack {
+                        Spacer()
+                        resetCameraButton
+                    }
+                    .padding(.horizontal, 16)
+                    overlayCard
+                }
+                .padding(.bottom, 8)
             }
-            .padding(.bottom, 8)
+            .onAppear {
+                screenHeight = geometry.size.height
+            }
+            .onChange(of: geometry.size.height) {
+                screenHeight = geometry.size.height
+            }
         }
         .onChange(of: viewModel.nearestStation) {
             updateCamera()
@@ -39,6 +52,9 @@ struct MapContentView: View {
         }
         .onChange(of: viewModel.currentLocation?.coordinate.longitude) {
             updateCameraIfNeeded()
+        }
+        .onChange(of: overlayExpanded) {
+            updateCamera()
         }
     }
 
@@ -195,7 +211,7 @@ struct MapContentView: View {
             )
         }
         .clipped()
-        .frame(height: 340)
+        .frame(height: Self.overlayFullHeight)
         .padding(.horizontal, 16)
     }
 
@@ -249,10 +265,24 @@ struct MapContentView: View {
 
     // MARK: - Camera
 
+    /// Fraction of the screen height occupied by the overlay in its current state.
+    private var overlayScreenFraction: CGFloat {
+        guard screenHeight > 0 else { return 0 }
+        let visibleOverlayHeight = overlayExpanded
+            ? Self.overlayFullHeight
+            : Self.collapsedVisibleHeight
+        return (visibleOverlayHeight + Self.overlayBottomPadding) / screenHeight
+    }
+
     private func updateCamera() {
         guard let userLocation = viewModel.currentLocation else { return }
 
         let userCoord = userLocation.coordinate
+        let overlayFraction = overlayScreenFraction
+        // The visible area above the overlay is (1 - overlayFraction) of the screen.
+        // Scale the map span so the content fits within that visible portion, then
+        // shift the center southward so markers render in the upper visible area.
+        let visibleFraction = max(1 - overlayFraction, 0.3)
 
         if let station = viewModel.nearestStation {
             let minLat = min(userCoord.latitude, station.coordinate.latitude)
@@ -263,25 +293,39 @@ struct MapContentView: View {
             let latMargin = max((maxLat - minLat) * 0.4, 0.002)
             let lonMargin = max((maxLon - minLon) * 0.4, 0.002)
 
+            let contentLat = (maxLat - minLat) + latMargin * 2
+            let contentLon = (maxLon - minLon) + lonMargin * 2
+
+            // Expand the latitude span so the content occupies only the visible portion.
+            let mapSpanLat = contentLat / visibleFraction
+            let latOffset = mapSpanLat * overlayFraction / 2
+
             let region = MKCoordinateRegion(
                 center: CLLocationCoordinate2D(
-                    latitude: (minLat + maxLat) / 2,
+                    latitude: (minLat + maxLat) / 2 - latOffset,
                     longitude: (minLon + maxLon) / 2
                 ),
                 span: MKCoordinateSpan(
-                    latitudeDelta: (maxLat - minLat) + latMargin * 2,
-                    longitudeDelta: (maxLon - minLon) + lonMargin * 2
+                    latitudeDelta: mapSpanLat,
+                    longitudeDelta: contentLon
                 )
             )
             withAnimation(.easeInOut(duration: 0.5)) {
                 cameraPosition = .region(region)
             }
         } else {
+            let contentLat = 0.01
+            let mapSpanLat = contentLat / visibleFraction
+            let latOffset = mapSpanLat * overlayFraction / 2
+
             withAnimation(.easeInOut(duration: 0.5)) {
                 cameraPosition = .region(
                     MKCoordinateRegion(
-                        center: userCoord,
-                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                        center: CLLocationCoordinate2D(
+                            latitude: userCoord.latitude - latOffset,
+                            longitude: userCoord.longitude
+                        ),
+                        span: MKCoordinateSpan(latitudeDelta: mapSpanLat, longitudeDelta: contentLat)
                     )
                 )
             }
