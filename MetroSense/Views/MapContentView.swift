@@ -10,6 +10,7 @@ struct MapContentView: View {
     @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
     @State private var dragOffset: CGFloat = 0
     @State private var screenHeight: CGFloat = 0
+    @State private var bottomSafeAreaInset: CGFloat = 0
 
     /// Height of the collapsed portion that stays visible (drag handle + status icon only).
     private static let collapsedVisibleHeight: CGFloat = 130
@@ -17,8 +18,11 @@ struct MapContentView: View {
     private static let overlayFullHeight: CGFloat = 340
     /// Threshold to trigger a snap when dragging.
     private static let snapThreshold: CGFloat = 80
-    /// Bottom padding below the overlay card.
-    private static let overlayBottomPadding: CGFloat = 8
+
+    /// Total overlay height including bottom safe area inset.
+    private var totalOverlayHeight: CGFloat {
+        Self.overlayFullHeight + bottomSafeAreaInset
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -35,13 +39,18 @@ struct MapContentView: View {
                     .padding(.horizontal, 16)
                     overlayCard
                 }
-                .padding(.bottom, 8)
+                .ignoresSafeArea(edges: .bottom)
             }
             .onAppear {
                 screenHeight = geometry.size.height
+                bottomSafeAreaInset = geometry.safeAreaInsets.bottom
             }
             .onChange(of: geometry.size.height) {
                 screenHeight = geometry.size.height
+                bottomSafeAreaInset = geometry.safeAreaInsets.bottom
+            }
+            .onChange(of: geometry.safeAreaInsets.bottom) {
+                bottomSafeAreaInset = geometry.safeAreaInsets.bottom
             }
         }
         .onChange(of: viewModel.nearestStation) {
@@ -189,8 +198,9 @@ struct MapContentView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
             }
+            .padding(.bottom, bottomSafeAreaInset)
             .frame(maxWidth: .infinity)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+            .background(.ultraThinMaterial, in: UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
             .offset(y: clampedDrag)
             .gesture(
                 DragGesture()
@@ -211,8 +221,7 @@ struct MapContentView: View {
             )
         }
         .clipped()
-        .frame(height: Self.overlayFullHeight)
-        .padding(.horizontal, 16)
+        .frame(height: totalOverlayHeight)
     }
 
     private var dragHandle: some View {
@@ -254,7 +263,7 @@ struct MapContentView: View {
     /// The vertical offset applied to the overlay card content, mirrored here
     /// so the reset button tracks the overlay during drag and snap animations.
     private var overlayOffset: CGFloat {
-        let collapseOffset = max(Self.overlayFullHeight - Self.collapsedVisibleHeight, 0)
+        let collapseOffset = max(totalOverlayHeight - Self.collapsedVisibleHeight, 0)
         let baseOffset = overlayExpanded ? 0 : collapseOffset
         return min(max(dragOffset + baseOffset, 0), collapseOffset)
     }
@@ -278,9 +287,9 @@ struct MapContentView: View {
     private var overlayScreenFraction: CGFloat {
         guard screenHeight > 0 else { return 0 }
         let visibleOverlayHeight = overlayExpanded
-            ? Self.overlayFullHeight
+            ? totalOverlayHeight
             : Self.collapsedVisibleHeight
-        return (visibleOverlayHeight + Self.overlayBottomPadding) / screenHeight
+        return visibleOverlayHeight / screenHeight
     }
 
     private func updateCamera() {
