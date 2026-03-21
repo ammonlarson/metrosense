@@ -7,123 +7,126 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		143F7A310FE284BB9A3B4CBF /* MetroTripState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134B8D8EA13AF3C3AD4A0D05 /* MetroTripState.swift */; };
-		1F4DDCAAF10DCC71E686A563 /* MetroStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92594807AC8FDC585538172 /* MetroStation.swift */; };
-		21ED3661CD5B119978188413 /* MetroSenseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA0E132A22DC9989E172789 /* MetroSenseApp.swift */; };
-		26A8CD89409551D2C4208A1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D3CD3628C8843AF015C790C5 /* Assets.xcassets */; };
-		3DCE0FC87AB4C86E71F85053 /* NotificationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800A8BCAE9B49F26AD72E7FB /* NotificationSettings.swift */; };
-		3DEE7CD72A5AF9C702C55428 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052B41B5859998E917B55816 /* SettingsView.swift */; };
-		46EE9BCAF80F62FA940FF565 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79F4D35A834FABE4CEFD5346 /* NotificationService.swift */; };
-		540E7E4D93E18465A3571DDA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F1E59799310D90211C6E18 /* ContentView.swift */; };
-		67B04D7AF68F85CC21387B4A /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46FD4A5D0E36C707C987F0FC /* SplashScreen.swift */; };
-		BC96D74F993D30E63D21BFB9 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698E2F2256312D41CBC37822 /* LocationService.swift */; };
-		F1A0997BBB8B13A2F8BB4AA3 /* MetroLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CC6BDAA44207298F58CA77 /* MetroLine.swift */; };
-		F28276F0BE8AF59086C08A62 /* MetroViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9E40E3D3B13528A1777CAB /* MetroViewModel.swift */; };
+		0C7DFAD6DA55C5CFA8BB04ED /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3DAA8333A89FEB3A9954DD6 /* ContentView.swift */; };
+		2D100B05B71F7D0BF9EDB78E /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DC1367451D3060AD2ADEAC /* NotificationService.swift */; };
+		40D7299D802D58CD81088BB6 /* MetroTripState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B98CFDE82A93ADF8A57FCB /* MetroTripState.swift */; };
+		60466D3225B82933E5C98507 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE224E25AB5C6325640083 /* Assets.xcassets */; };
+		6FD5402AA4B21C8588F762FF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A46816E662033897D01B62A6 /* SettingsView.swift */; };
+		A3270A9E3DBDF7B9D145F2FA /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B764777F71F980FF1A1C6979 /* SplashScreen.swift */; };
+		A6285064E544E4C9C9F2A585 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76AE715724C3018308461364 /* LocationService.swift */; };
+		ACF3D20FDB85920502E664CA /* MetroSenseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B860E1311A218F9535E0D19 /* MetroSenseApp.swift */; };
+		C4F154BC3A49FB5E2314FF35 /* MetroLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCADA81F1831CC5803DB2113 /* MetroLine.swift */; };
+		C628CB165B841562784910FB /* NotificationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE37611856ABD7622C0C3BA8 /* NotificationSettings.swift */; };
+		D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */; };
+		EB37E135E77FCACF2C70C068 /* MetroStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AEC0F64175BB303AD89638 /* MetroStation.swift */; };
+		FE5E1C6BB9ABAD0DAD64FF26 /* MetroViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8BAB1520BB64FF777D1E86 /* MetroViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		052B41B5859998E917B55816 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		134B8D8EA13AF3C3AD4A0D05 /* MetroTripState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroTripState.swift; sourceTree = "<group>"; };
-		46FD4A5D0E36C707C987F0FC /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
-		54F1E59799310D90211C6E18 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		698E2F2256312D41CBC37822 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
-		6C9E40E3D3B13528A1777CAB /* MetroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroViewModel.swift; sourceTree = "<group>"; };
-		78754D12CF58E282F1F2EBE5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		79F4D35A834FABE4CEFD5346 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		800A8BCAE9B49F26AD72E7FB /* NotificationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettings.swift; sourceTree = "<group>"; };
-		82CC6BDAA44207298F58CA77 /* MetroLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroLine.swift; sourceTree = "<group>"; };
-		9EA0E132A22DC9989E172789 /* MetroSenseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroSenseApp.swift; sourceTree = "<group>"; };
-		A5F176667C85C6FAE597EBCB /* MetroSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetroSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D3CD3628C8843AF015C790C5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E92594807AC8FDC585538172 /* MetroStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroStation.swift; sourceTree = "<group>"; };
+		20AEC0F64175BB303AD89638 /* MetroStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroStation.swift; sourceTree = "<group>"; };
+		43B98CFDE82A93ADF8A57FCB /* MetroTripState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroTripState.swift; sourceTree = "<group>"; };
+		4B860E1311A218F9535E0D19 /* MetroSenseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroSenseApp.swift; sourceTree = "<group>"; };
+		4D3821658957C4C13DBF697D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4DAE224E25AB5C6325640083 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5B8BAB1520BB64FF777D1E86 /* MetroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroViewModel.swift; sourceTree = "<group>"; };
+		66DC1367451D3060AD2ADEAC /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		76AE715724C3018308461364 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		9C2421502AA5169B997BE291 /* MetroSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetroSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A46816E662033897D01B62A6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B764777F71F980FF1A1C6979 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
+		BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationFilterPickerView.swift; sourceTree = "<group>"; };
+		EE37611856ABD7622C0C3BA8 /* NotificationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettings.swift; sourceTree = "<group>"; };
+		F3DAA8333A89FEB3A9954DD6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FCADA81F1831CC5803DB2113 /* MetroLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroLine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		062CAE646074BFE32A27442E /* ViewModels */ = {
+		5727435CA9049B94A139E287 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				6C9E40E3D3B13528A1777CAB /* MetroViewModel.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		064BD5B31A25657EF0AA415E /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				D3CD3628C8843AF015C790C5 /* Assets.xcassets */,
-				78754D12CF58E282F1F2EBE5 /* Info.plist */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		15FCF31520C722F996EB6960 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				052B41B5859998E917B55816 /* SettingsView.swift */,
-				46FD4A5D0E36C707C987F0FC /* SplashScreen.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		6B16C8EC22C2BD4697672C34 /* MetroSense */ = {
-			isa = PBXGroup;
-			children = (
-				54F1E59799310D90211C6E18 /* ContentView.swift */,
-				9EA0E132A22DC9989E172789 /* MetroSenseApp.swift */,
-				90D983A00E9B35144451DFBE /* Models */,
-				064BD5B31A25657EF0AA415E /* Resources */,
-				E43A34A272DD31E203A3AB71 /* Services */,
-				062CAE646074BFE32A27442E /* ViewModels */,
-				15FCF31520C722F996EB6960 /* Views */,
-			);
-			path = MetroSense;
-			sourceTree = "<group>";
-		};
-		7C2244C9499D7C2C35A78D35 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A5F176667C85C6FAE597EBCB /* MetroSense.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		90D983A00E9B35144451DFBE /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				82CC6BDAA44207298F58CA77 /* MetroLine.swift */,
-				E92594807AC8FDC585538172 /* MetroStation.swift */,
-				134B8D8EA13AF3C3AD4A0D05 /* MetroTripState.swift */,
-				800A8BCAE9B49F26AD72E7FB /* NotificationSettings.swift */,
+				FCADA81F1831CC5803DB2113 /* MetroLine.swift */,
+				20AEC0F64175BB303AD89638 /* MetroStation.swift */,
+				43B98CFDE82A93ADF8A57FCB /* MetroTripState.swift */,
+				EE37611856ABD7622C0C3BA8 /* NotificationSettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
 		};
-		E43A34A272DD31E203A3AB71 /* Services */ = {
+		7118694D02F71D099B4598D5 /* MetroSense */ = {
 			isa = PBXGroup;
 			children = (
-				698E2F2256312D41CBC37822 /* LocationService.swift */,
-				79F4D35A834FABE4CEFD5346 /* NotificationService.swift */,
+				F3DAA8333A89FEB3A9954DD6 /* ContentView.swift */,
+				4B860E1311A218F9535E0D19 /* MetroSenseApp.swift */,
+				5727435CA9049B94A139E287 /* Models */,
+				A3EECD00F4AB2016A790E36A /* Resources */,
+				EACD03A596808EADB5DD2296 /* Services */,
+				E5E87F9F9EDD76CF3DF13F3A /* ViewModels */,
+				EE7C6D58533096DB4EC01B09 /* Views */,
+			);
+			path = MetroSense;
+			sourceTree = "<group>";
+		};
+		A3EECD00F4AB2016A790E36A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4DAE224E25AB5C6325640083 /* Assets.xcassets */,
+				4D3821658957C4C13DBF697D /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		B9CA9433513771352C750928 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9C2421502AA5169B997BE291 /* MetroSense.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E5E87F9F9EDD76CF3DF13F3A /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				5B8BAB1520BB64FF777D1E86 /* MetroViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		EACD03A596808EADB5DD2296 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				76AE715724C3018308461364 /* LocationService.swift */,
+				66DC1367451D3060AD2ADEAC /* NotificationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		F39F6555891E77674056672B = {
+		EE7C6D58533096DB4EC01B09 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				6B16C8EC22C2BD4697672C34 /* MetroSense */,
-				7C2244C9499D7C2C35A78D35 /* Products */,
+				A46816E662033897D01B62A6 /* SettingsView.swift */,
+				B764777F71F980FF1A1C6979 /* SplashScreen.swift */,
+				BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F2CE998B1D0F8EDCB01FD878 = {
+			isa = PBXGroup;
+			children = (
+				7118694D02F71D099B4598D5 /* MetroSense */,
+				B9CA9433513771352C750928 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8718F6B9BCDDA46F944D4C76 /* MetroSense */ = {
+		F41A2E6F89DB32AEB68B769A /* MetroSense */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2B7AA999E05147267D3AECE1 /* Build configuration list for PBXNativeTarget "MetroSense" */;
+			buildConfigurationList = 0BFD979F9D89DB600157BE27 /* Build configuration list for PBXNativeTarget "MetroSense" */;
 			buildPhases = (
-				A36AB39A11216F4342629AC3 /* Sources */,
-				025050885CEFD1A93B7394A8 /* Resources */,
+				3B32D210FD60A9766C7CDB95 /* Sources */,
+				1DA54554F98A261AF15BF800 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -133,107 +136,72 @@
 			packageProductDependencies = (
 			);
 			productName = MetroSense;
-			productReference = A5F176667C85C6FAE597EBCB /* MetroSense.app */;
+			productReference = 9C2421502AA5169B997BE291 /* MetroSense.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		409B26AD982166D9F9843566 /* Project object */ = {
+		B0299D2946590EA43E5D4A37 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 			};
-			buildConfigurationList = F1A8CECF9D840E4DB92E95BD /* Build configuration list for PBXProject "MetroSense" */;
+			buildConfigurationList = E6DAD90C79BE7DC11B49D7F6 /* Build configuration list for PBXProject "MetroSense" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
 				en,
 			);
-			mainGroup = F39F6555891E77674056672B;
+			mainGroup = F2CE998B1D0F8EDCB01FD878;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 7C2244C9499D7C2C35A78D35 /* Products */;
+			productRefGroup = B9CA9433513771352C750928 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8718F6B9BCDDA46F944D4C76 /* MetroSense */,
+				F41A2E6F89DB32AEB68B769A /* MetroSense */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		025050885CEFD1A93B7394A8 /* Resources */ = {
+		1DA54554F98A261AF15BF800 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26A8CD89409551D2C4208A1C /* Assets.xcassets in Resources */,
+				60466D3225B82933E5C98507 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A36AB39A11216F4342629AC3 /* Sources */ = {
+		3B32D210FD60A9766C7CDB95 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				540E7E4D93E18465A3571DDA /* ContentView.swift in Sources */,
-				BC96D74F993D30E63D21BFB9 /* LocationService.swift in Sources */,
-				21ED3661CD5B119978188413 /* MetroSenseApp.swift in Sources */,
-				F1A0997BBB8B13A2F8BB4AA3 /* MetroLine.swift in Sources */,
-				1F4DDCAAF10DCC71E686A563 /* MetroStation.swift in Sources */,
-				143F7A310FE284BB9A3B4CBF /* MetroTripState.swift in Sources */,
-				F28276F0BE8AF59086C08A62 /* MetroViewModel.swift in Sources */,
-				46EE9BCAF80F62FA940FF565 /* NotificationService.swift in Sources */,
-				3DCE0FC87AB4C86E71F85053 /* NotificationSettings.swift in Sources */,
-				3DEE7CD72A5AF9C702C55428 /* SettingsView.swift in Sources */,
-				67B04D7AF68F85CC21387B4A /* SplashScreen.swift in Sources */,
+				0C7DFAD6DA55C5CFA8BB04ED /* ContentView.swift in Sources */,
+				A6285064E544E4C9C9F2A585 /* LocationService.swift in Sources */,
+				C4F154BC3A49FB5E2314FF35 /* MetroLine.swift in Sources */,
+				ACF3D20FDB85920502E664CA /* MetroSenseApp.swift in Sources */,
+				EB37E135E77FCACF2C70C068 /* MetroStation.swift in Sources */,
+				40D7299D802D58CD81088BB6 /* MetroTripState.swift in Sources */,
+				FE5E1C6BB9ABAD0DAD64FF26 /* MetroViewModel.swift in Sources */,
+				2D100B05B71F7D0BF9EDB78E /* NotificationService.swift in Sources */,
+				C628CB165B841562784910FB /* NotificationSettings.swift in Sources */,
+				6FD5402AA4B21C8588F762FF /* SettingsView.swift in Sources */,
+				A3270A9E3DBDF7B9D145F2FA /* SplashScreen.swift in Sources */,
+				D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		1C6E5C7AA5CABA96E799F187 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 5GSP7B436V;
-				INFOPLIST_FILE = MetroSense/Resources/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.metrosense.app;
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.9;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		25DFD4EA51DB4879AE1ECCF3 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 5GSP7B436V;
-				INFOPLIST_FILE = MetroSense/Resources/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.metrosense.app;
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.9;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		9BA184250040676A19D1F2B8 /* Release */ = {
+		73A0C4712E578712A1F1AF61 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -289,7 +257,43 @@
 			};
 			name = Release;
 		};
-		AC8CFD1491D5ECBCA6A2228A /* Debug */ = {
+		892225970C845E3AD98780A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 5GSP7B436V;
+				INFOPLIST_FILE = MetroSense/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.metrosense.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9A3B8AEF4B6638E3EE9B72C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 5GSP7B436V;
+				INFOPLIST_FILE = MetroSense/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.metrosense.app;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E2B27FE88574BA8DDC0B212D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -355,25 +359,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2B7AA999E05147267D3AECE1 /* Build configuration list for PBXNativeTarget "MetroSense" */ = {
+		0BFD979F9D89DB600157BE27 /* Build configuration list for PBXNativeTarget "MetroSense" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				25DFD4EA51DB4879AE1ECCF3 /* Debug */,
-				1C6E5C7AA5CABA96E799F187 /* Release */,
+				9A3B8AEF4B6638E3EE9B72C4 /* Debug */,
+				892225970C845E3AD98780A9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		F1A8CECF9D840E4DB92E95BD /* Build configuration list for PBXProject "MetroSense" */ = {
+		E6DAD90C79BE7DC11B49D7F6 /* Build configuration list for PBXProject "MetroSense" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AC8CFD1491D5ECBCA6A2228A /* Debug */,
-				9BA184250040676A19D1F2B8 /* Release */,
+				E2B27FE88574BA8DDC0B212D /* Debug */,
+				73A0C4712E578712A1F1AF61 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 409B26AD982166D9F9843566 /* Project object */;
+	rootObject = B0299D2946590EA43E5D4A37 /* Project object */;
 }
