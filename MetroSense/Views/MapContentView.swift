@@ -44,10 +44,9 @@ struct MapContentView: View {
         allStationNames = names.sorted()
     }
 
-    /// Total overlay height including bottom safe area inset.
+    /// Total overlay height (background extends into safe area via ignoresSafeArea).
     private var totalOverlayHeight: CGFloat {
-        let baseHeight = settingsVisible ? Self.settingsOverlayHeight : Self.overlayFullHeight
-        return baseHeight + bottomSafeAreaInset
+        settingsVisible ? Self.settingsOverlayHeight : Self.overlayFullHeight
     }
 
     var body: some View {
@@ -280,9 +279,12 @@ struct MapContentView: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(.bottom, bottomSafeAreaInset)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(colorScheme == .dark ? Color.black : Color.white, in: UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
+            .background {
+                (colorScheme == .dark ? Color.black : Color.white)
+                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
+                    .ignoresSafeArea(edges: .bottom)
+            }
             .offset(y: clampedDrag)
             .gesture(
                 DragGesture()
@@ -312,7 +314,6 @@ struct MapContentView: View {
                     }
             )
         }
-        .clipped()
         .frame(height: totalOverlayHeight)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: settingsVisible)
     }
