@@ -358,7 +358,13 @@ struct SettingsView: View {
 
     private func runTest() {
         isTesting = true
-        testProgress = 0
+        testResult = nil
+
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            testProgress = 0
+        }
 
         DispatchQueue.main.async {
             testProgress = 1
