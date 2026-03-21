@@ -4,7 +4,9 @@ import CoreLocation
 struct SettingsView: View {
     @State private var settings: NotificationSettings
     @State private var testResult: NotificationTestResult?
-    @State private var testRunCount: Int = 0
+    @State private var isTesting: Bool = false
+    @State private var testProgress: CGFloat = 0
+    @State private var testRunId: Int = 0
     @State private var isStationListExpanded: Bool = false
     @State private var stationDisplayOrder: [String] = []
     @State private var lastSelectedStations: Set<String> = []
@@ -286,86 +288,67 @@ struct SettingsView: View {
     private var testSection: some View {
         Section {
             Button {
-                testRunCount += 1
-                testResult = NotificationTestResult.evaluate(
-                    settings: settings,
-                    location: currentLocation,
-                    speed: currentSpeed,
-                    runNumber: testRunCount,
-                    lastMovementNotificationTime: lastMovementNotificationTime
-                )
+                runTest()
             } label: {
-                Label("Test Notifications Now", systemImage: "bell.badge")
-            }
-            .disabled(!settings.isValid)
-
-            if let result = testResult {
                 HStack {
-                    Image(systemName: "arrow.clockwise")
-                        .foregroundStyle(.secondary)
-                    Text("Run #\(result.runNumber)")
-                        .font(.subheadline.monospacedDigit())
-                        .foregroundStyle(.secondary)
+                    Label("Test Notifications Now", systemImage: "bell.badge")
                     Spacer()
-                    Text(result.timestamp, style: .time)
-                        .font(.subheadline.monospacedDigit())
-                        .foregroundStyle(.secondary)
                 }
+            }
+            .disabled(!settings.isValid || isTesting)
 
-                if result.proximityWouldFire {
-                    Label {
+            if isTesting || testResult != nil {
+                // Proximity row: shows progress bar while testing, result when done
+                if isTesting {
+                    GeometryReader { geometry in
+                        ZStack(alignment: .leading) {
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(Color(.systemGray5))
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [.blue, .purple],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: geometry.size.width * testProgress)
+                                .animation(.linear(duration: 0.7), value: testProgress)
+                        }
+                    }
+                    .id(testRunId)
+                    .frame(height: 12)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                } else if let result = testResult {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Image(systemName: result.proximityWouldFire ? "checkmark.circle.fill" : "xmark.circle.fill")
+                            .foregroundStyle(result.proximityWouldFire ? .green : .red)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Proximity: Would fire")
+                            Text(result.proximityWouldFire ? "Proximity: Would fire" : "Proximity: Would not fire")
                                 .foregroundStyle(.primary)
                             Text(result.proximityDetail)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
-                    } icon: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                    }
-                } else {
-                    Label {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Proximity: Would not fire")
-                                .foregroundStyle(.primary)
-                            Text(result.proximityDetail)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    } icon: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.red)
                     }
                 }
 
-                if result.movementWouldFire {
-                    Label {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Movement: Would fire")
-                                .foregroundStyle(.primary)
-                            Text(result.movementDetail)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                if let result = testResult {
+                    Group {
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Image(systemName: result.movementWouldFire ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                .foregroundStyle(result.movementWouldFire ? .green : .red)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(result.movementWouldFire ? "Movement: Would fire" : "Movement: Would not fire")
+                                    .foregroundStyle(.primary)
+                                Text(result.movementDetail)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
-                    } icon: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
                     }
-                } else {
-                    Label {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Movement: Would not fire")
-                                .foregroundStyle(.primary)
-                            Text(result.movementDetail)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    } icon: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.red)
-                    }
+                    .id("testMovementResult")
+                    .opacity(isTesting ? 0 : 1)
                 }
             }
         } header: {
@@ -373,6 +356,56 @@ struct SettingsView: View {
         } footer: {
             Text("Check whether a notification would fire right now based on your current location and speed.")
         }
+    }
+
+    private func runTest() {
+        testResult = nil
+        testProgress = 0
+        testRunId += 1
+        isTesting = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            testProgress = 1
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+            let result = NotificationTestResult.evaluate(
+                settings: settings,
+                location: currentLocation,
+                speed: currentSpeed,
+                lastMovementNotificationTime: lastMovementNotificationTime
+            )
+            withAnimation {
+                testResult = result
+                isTesting = false
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                scrollFormToBottom()
+            }
+        }
+    }
+
+    private func scrollFormToBottom() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first,
+              let scrollView = findScrollView(in: window) else { return }
+        let bottomOffset = CGPoint(
+            x: 0,
+            y: max(0, scrollView.contentSize.height - scrollView.bounds.height + scrollView.contentInset.bottom)
+        )
+        scrollView.setContentOffset(bottomOffset, animated: true)
+    }
+
+    private func findScrollView(in view: UIView) -> UIScrollView? {
+        if let scrollView = view as? UIScrollView {
+            return scrollView
+        }
+        for subview in view.subviews {
+            if let found = findScrollView(in: subview) {
+                return found
+            }
+        }
+        return nil
     }
 
     // MARK: - Movement Section
@@ -474,7 +507,6 @@ struct SettingsView: View {
 // MARK: - Notification Test Result
 
 struct NotificationTestResult: Equatable {
-    let runNumber: Int
     let timestamp: Date
     let proximityWouldFire: Bool
     let proximityDetail: String
@@ -485,7 +517,6 @@ struct NotificationTestResult: Equatable {
         settings: NotificationSettings,
         location: CLLocation?,
         speed: Double,
-        runNumber: Int,
         lastMovementNotificationTime: Date? = nil
     ) -> NotificationTestResult {
         // Evaluate proximity
@@ -580,7 +611,6 @@ struct NotificationTestResult: Equatable {
         }
 
         return NotificationTestResult(
-            runNumber: runNumber,
             timestamp: Date(),
             proximityWouldFire: proximityResult.0,
             proximityDetail: proximityResult.1,
