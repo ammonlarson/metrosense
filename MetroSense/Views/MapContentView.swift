@@ -101,21 +101,31 @@ struct MapContentView: View {
                 .padding(.horizontal)
 
             // Info rows
-            HStack {
-                infoRow(
-                    icon: "speedometer",
-                    label: "Speed",
-                    value: String(format: "%.0f km/h", viewModel.speedKMH)
-                )
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "tram.fill")
+                    .font(.title2)
+                    .foregroundStyle(.blue)
 
-                Divider()
-                    .frame(height: 32)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "speedometer")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(String(format: "%.0f km/h", viewModel.speedKMH))
+                            .font(.subheadline.monospacedDigit().bold())
+                    }
 
-                infoRow(
-                    icon: "tram.fill",
-                    label: nearestStationLabel,
-                    value: nearestStationDistance
-                )
+                    HStack(spacing: 6) {
+                        Image(systemName: "mappin.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text("\(nearestStationLabel) · \(nearestStationDistance)")
+                            .font(.subheadline.bold())
+                            .lineLimit(1)
+                    }
+                }
+
+                Spacer()
             }
             .padding(.vertical, 12)
             .padding(.horizontal)
@@ -124,25 +134,6 @@ struct MapContentView: View {
         .padding(.bottom, 8)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal, 16)
-    }
-
-    private func infoRow(icon: String, label: String, value: String) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Spacer()
-
-            Text(value)
-                .font(.subheadline.monospacedDigit().bold())
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 4)
     }
 
     // MARK: - Watermark
