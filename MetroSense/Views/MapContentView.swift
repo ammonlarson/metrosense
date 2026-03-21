@@ -7,6 +7,14 @@ struct MapContentView: View {
     @State private var pulseScale: CGFloat = 1.0
     @State private var lastCameraUpdateLocation: CLLocation?
 
+    @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
+    @State private var dragOffset: CGFloat = 0
+
+    /// Height of the collapsed portion that stays visible (drag handle + status icon only).
+    private static let collapsedVisibleHeight: CGFloat = 130
+    /// Threshold to trigger a snap when dragging.
+    private static let snapThreshold: CGFloat = 80
+
     var body: some View {
         ZStack(alignment: .bottom) {
             mapLayer
@@ -98,69 +106,107 @@ struct MapContentView: View {
     }
 
     private var overlayCard: some View {
-        VStack(spacing: 0) {
-            Image(metroStatusImage)
-                .resizable()
-                .scaledToFit()
-                .frame(height: 100)
-                .padding(.top, 20)
-                .padding(.bottom, 12)
+        GeometryReader { proxy in
+            let fullHeight = proxy.size.height
+            let collapseOffset = max(fullHeight - Self.collapsedVisibleHeight, 0)
+            let baseOffset = overlayExpanded ? 0 : collapseOffset
+            let clampedDrag = min(max(dragOffset + baseOffset, 0), collapseOffset)
 
-            Text(tripStateLabel)
-                .font(.title2.bold())
-                .foregroundStyle(.primary)
-                .padding(.bottom, 4)
+            VStack(spacing: 0) {
+                dragHandle
 
-            Text(tripStateDetail)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-                .padding(.bottom, 16)
+                Image(metroStatusImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 100)
+                    .padding(.top, 8)
+                    .padding(.bottom, 12)
 
-            Divider()
-                .padding(.horizontal)
+                Text(tripStateLabel)
+                    .font(.title2.bold())
+                    .foregroundStyle(.primary)
+                    .padding(.bottom, 4)
 
-            // Speed row
-            HStack {
-                Image(systemName: "speedometer")
-                    .font(.title3)
+                Text(tripStateDetail)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text("Speed")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text(String(format: "%.0f km/h", viewModel.speedKMH))
-                    .font(.title3.monospacedDigit().bold())
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                    .padding(.bottom, 16)
 
-            Divider()
-                .padding(.horizontal)
+                Divider()
+                    .padding(.horizontal)
 
-            // Nearest station row
-            HStack {
-                Image(systemName: "tram.fill")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-                Text("Nearest Station")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text(nearestStationLabel)
-                        .font(.title3.bold())
-                    Text(nearestStationDistance)
-                        .font(.subheadline)
+                HStack {
+                    Image(systemName: "speedometer")
+                        .font(.title3)
                         .foregroundStyle(.secondary)
+                    Text("Speed")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(String(format: "%.0f km/h", viewModel.speedKMH))
+                        .font(.title3.monospacedDigit().bold())
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+
+                Divider()
+                    .padding(.horizontal)
+
+                HStack {
+                    Image(systemName: "tram.fill")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                    Text("Nearest Station")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(nearestStationLabel)
+                            .font(.title3.bold())
+                        Text(nearestStationDistance)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .frame(maxWidth: .infinity)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+            .offset(y: clampedDrag)
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        dragOffset = value.translation.height
+                    }
+                    .onEnded { value in
+                        let projected = value.predictedEndTranslation.height
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                            if projected > Self.snapThreshold {
+                                overlayExpanded = false
+                            } else if projected < -Self.snapThreshold {
+                                overlayExpanded = true
+                            }
+                            dragOffset = 0
+                        }
+                    }
+            )
         }
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+        .clipped()
+        .frame(height: 340)
         .padding(.horizontal, 16)
+    }
+
+    private var dragHandle: some View {
+        Capsule()
+            .fill(.secondary.opacity(0.5))
+            .frame(width: 36, height: 5)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
     }
 
     // MARK: - Degraded Banner
