@@ -83,10 +83,12 @@ struct MapContentView: View {
 
     private var overlayCard: some View {
         VStack(spacing: 0) {
-            // Watermark
-            watermark
+            Image(systemName: "tram.fill")
+                .font(.system(size: 36))
+                .foregroundStyle(.blue)
+                .padding(.top, 20)
+                .padding(.bottom, 12)
 
-            // Status
             VStack(spacing: 4) {
                 Text(tripStateLabel)
                     .font(.title2.bold())
@@ -96,59 +98,36 @@ struct MapContentView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            .padding(.bottom, 12)
+            .padding(.bottom, 16)
 
             Divider()
                 .padding(.horizontal)
 
-            // Info rows
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: "tram.fill")
-                    .font(.title2)
-                    .foregroundStyle(.blue)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "speedometer")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(String(format: "%.0f km/h", viewModel.speedKMH))
-                            .font(.subheadline.monospacedDigit().bold())
-                    }
-
-                    HStack(spacing: 6) {
-                        Image(systemName: "mappin.circle.fill")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text("\(nearestStationLabel) · \(nearestStationDistance)")
-                            .font(.subheadline.bold())
-                            .lineLimit(1)
-                    }
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 6) {
+                    Image(systemName: "speedometer")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(String(format: "%.0f km/h", viewModel.speedKMH))
+                        .font(.subheadline.monospacedDigit().bold())
                 }
 
-                Spacer()
+                HStack(spacing: 6) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("\(nearestStationLabel) · \(nearestStationDistance)")
+                        .font(.subheadline.bold())
+                        .lineLimit(1)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 12)
             .padding(.horizontal)
         }
-        .padding(.top, 16)
         .padding(.bottom, 8)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
         .padding(.horizontal, 16)
-    }
-
-    // MARK: - Watermark
-
-    private var watermark: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "tram.circle")
-                .font(.caption2)
-            Text("METRO")
-                .font(.caption2.bold())
-                .kerning(2)
-        }
-        .foregroundStyle(.secondary.opacity(0.4))
-        .padding(.bottom, 8)
     }
 
     // MARK: - Degraded Banner
