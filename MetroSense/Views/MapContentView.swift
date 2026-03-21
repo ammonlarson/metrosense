@@ -98,32 +98,30 @@ struct MapContentView: View {
     }
 
     private var overlayCard: some View {
-        VStack(spacing: 10) {
-            // Main status card
-            VStack(spacing: 0) {
-                Image(metroStatusImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 100)
-                    .padding(.top, 20)
-                    .padding(.bottom, 12)
+        VStack(spacing: 0) {
+            Image(metroStatusImage)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 100)
+                .padding(.top, 20)
+                .padding(.bottom, 12)
 
-                Text(tripStateLabel)
-                    .font(.title2.bold())
-                    .foregroundStyle(.primary)
-                    .padding(.bottom, 4)
+            Text(tripStateLabel)
+                .font(.title2.bold())
+                .foregroundStyle(.primary)
+                .padding(.bottom, 4)
 
-                Text(tripStateDetail)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
-            }
-            .frame(maxWidth: .infinity)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+            Text(tripStateDetail)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+                .padding(.bottom, 16)
 
-            // Speed card
+            Divider()
+                .padding(.horizontal)
+
+            // Speed row
             HStack {
                 Image(systemName: "speedometer")
                     .font(.title3)
@@ -137,9 +135,11 @@ struct MapContentView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
 
-            // Nearest station card
+            Divider()
+                .padding(.horizontal)
+
+            // Nearest station row
             HStack {
                 Image(systemName: "tram.fill")
                     .font(.title3)
@@ -158,8 +158,8 @@ struct MapContentView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
         .padding(.horizontal, 16)
     }
 
