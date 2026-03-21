@@ -251,6 +251,14 @@ struct MapContentView: View {
 
     // MARK: - Reset Camera Button
 
+    /// The vertical offset applied to the overlay card content, mirrored here
+    /// so the reset button tracks the overlay during drag and snap animations.
+    private var overlayOffset: CGFloat {
+        let collapseOffset = max(Self.overlayFullHeight - Self.collapsedVisibleHeight, 0)
+        let baseOffset = overlayExpanded ? 0 : collapseOffset
+        return min(max(dragOffset + baseOffset, 0), collapseOffset)
+    }
+
     private var resetCameraButton: some View {
         Button {
             lastCameraUpdateLocation = nil
@@ -261,6 +269,7 @@ struct MapContentView: View {
                 .padding(10)
                 .background(.ultraThinMaterial, in: Circle())
         }
+        .offset(y: overlayOffset)
     }
 
     // MARK: - Camera
