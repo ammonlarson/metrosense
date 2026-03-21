@@ -323,25 +323,36 @@ struct MapContentView: View {
             dragHandle
             HStack {
                 Spacer()
-                Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                        if settingsVisible {
+                if settingsVisible {
+                    Button {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                             settingsVisible = false
-                        } else {
+                        }
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.secondary)
+                            .padding(10)
+                    }
+                    .accessibilityLabel("Close settings")
+                    .transition(.opacity)
+                } else {
+                    Button {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                             if !overlayExpanded {
                                 overlayExpanded = true
                             }
                             settingsVisible = true
                         }
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                            .padding(10)
                     }
-                } label: {
-                    Image(systemName: settingsVisible ? "xmark.circle.fill" : "gearshape.fill")
-                        .font(settingsVisible ? .title2 : .body)
-                        .foregroundStyle(.secondary)
-                        .padding(10)
-                        .contentTransition(.symbolEffect(.replace))
+                    .accessibilityLabel("Settings")
+                    .transition(.identity)
                 }
-                .accessibilityLabel(settingsVisible ? "Close settings" : "Settings")
             }
             .padding(.trailing, 8)
         }
