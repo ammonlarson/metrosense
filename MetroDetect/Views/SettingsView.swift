@@ -58,13 +58,13 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
+            ScrollViewReader { proxy in
             Form {
-                ScrollViewReader { proxy in
-                    proximitySection
-                    movementSection
-                    testSection
-                        .onAppear { scrollProxy = proxy }
-                }
+                proximitySection
+                movementSection
+                testSection
+            }
+            .onAppear { scrollProxy = proxy }
             }
             .navigationTitle("Notification Settings")
             .navigationBarTitleDisplayMode(.inline)
