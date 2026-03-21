@@ -14,6 +14,7 @@ struct MapContentView: View {
             if viewModel.isUsingDegradedLocation {
                 degradedBanner
             }
+            resetCameraButton
         }
         .onChange(of: viewModel.nearestStation) {
             updateCamera()
@@ -172,6 +173,29 @@ struct MapContentView: View {
             Spacer()
         }
         .padding(.top, 8)
+    }
+
+    // MARK: - Reset Camera Button
+
+    private var resetCameraButton: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Button {
+                    lastCameraUpdateLocation = nil
+                    updateCamera()
+                } label: {
+                    Image(systemName: "location.fill")
+                        .font(.body)
+                        .padding(10)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
+                .padding(.trailing, 16)
+                .padding(.bottom, 16)
+            }
+        }
+
     }
 
     // MARK: - Camera
