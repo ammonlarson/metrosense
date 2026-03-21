@@ -4,6 +4,7 @@ import MapKit
 struct MapContentView: View {
     @ObservedObject var viewModel: MetroViewModel
     @Binding var showingSettings: Bool
+    @Environment(\.colorScheme) private var colorScheme
     @State private var cameraPosition: MapCameraPosition = .automatic
     @State private var pulseScale: CGFloat = 1.0
     @State private var lastCameraUpdateLocation: CLLocation?
@@ -201,7 +202,7 @@ struct MapContentView: View {
             }
             .padding(.bottom, bottomSafeAreaInset)
             .frame(maxWidth: .infinity)
-            .background(.ultraThinMaterial, in: UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
+            .background(colorScheme == .dark ? Color.black : Color.white, in: UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
             .offset(y: clampedDrag)
             .gesture(
                 DragGesture()
