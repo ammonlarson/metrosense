@@ -5,8 +5,8 @@ struct SettingsView: View {
     @State private var settings: NotificationSettings
     @State private var testResult: NotificationTestResult?
     @State private var isTesting: Bool = false
-    @State private var testResultID: UUID = UUID()
     @State private var testProgress: CGFloat = 0
+    @State private var scrollProxy: ScrollViewProxy?
     @State private var isStationListExpanded: Bool = false
     @State private var stationDisplayOrder: [String] = []
     @State private var lastSelectedStations: Set<String> = []
@@ -58,10 +58,13 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
+            ScrollViewReader { proxy in
             Form {
                 proximitySection
                 movementSection
                 testSection
+            }
+            .onAppear { scrollProxy = proxy }
             }
             .navigationTitle("Notification Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -377,7 +380,7 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    .id(testResultID)
+                    .id("testMovementResult")
                     .opacity(isTesting ? 0 : 1)
                 }
             }
@@ -405,8 +408,12 @@ struct SettingsView: View {
             )
             withAnimation {
                 testResult = result
-                testResultID = UUID()
                 isTesting = false
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation {
+                    scrollProxy?.scrollTo("testMovementResult", anchor: .bottom)
+                }
             }
         }
     }
