@@ -27,7 +27,7 @@ struct MapContentView: View {
     /// Full overlay card height.
     private static let overlayFullHeight: CGFloat = 340
     /// Overlay height when settings categories are visible.
-    private static let settingsOverlayHeight: CGFloat = 700
+    private static let settingsOverlayHeight: CGFloat = 520
     /// Threshold to trigger a snap when dragging.
     private static let snapThreshold: CGFloat = 80
 
