@@ -5,8 +5,7 @@ struct MapContentView: View {
     @ObservedObject var viewModel: MetroViewModel
     var onSettingsChanged: (NotificationSettings) -> Void
     @Environment(\.colorScheme) private var colorScheme
-    @State private var cameraPosition: MapCameraPosition = .automatic
-    @State private var pulseScale: CGFloat = 1.0
+    @State private var mapRegion: MKCoordinateRegion?
     @State private var lastCameraUpdateLocation: CLLocation?
 
     @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
@@ -176,44 +175,11 @@ struct MapContentView: View {
     // MARK: - Map
 
     private var mapLayer: some View {
-        Map(position: $cameraPosition) {
-            UserAnnotation()
-
-            if let station = viewModel.nearestStation {
-                Annotation(station.name, coordinate: station.coordinate) {
-                    stationAnnotationView
-                }
-            }
-        }
-        .mapStyle(.standard(emphasis: .muted, pointsOfInterest: .including([.publicTransport])))
-        .mapControls {
-            MapCompass()
-        }
+        TransitMapView(
+            region: $mapRegion,
+            nearestStation: viewModel.nearestStation
+        )
         .ignoresSafeArea()
-    }
-
-    private var stationAnnotationView: some View {
-        ZStack {
-            Circle()
-                .fill(.blue.opacity(0.2))
-                .frame(width: 44, height: 44)
-                .scaleEffect(pulseScale)
-                .animation(
-                    .easeInOut(duration: 1.5).repeatForever(autoreverses: true),
-                    value: pulseScale
-                )
-
-            Circle()
-                .fill(.white)
-                .frame(width: 20, height: 20)
-
-            Image(systemName: "tram.fill")
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(.blue)
-        }
-        .onAppear {
-            pulseScale = 1.6
-        }
     }
 
     // MARK: - Overlay Card
@@ -562,9 +528,6 @@ struct MapContentView: View {
 
         let userCoord = userLocation.coordinate
         let overlayFraction = overlayScreenFraction
-        // The visible area above the overlay is (1 - overlayFraction) of the screen.
-        // Scale the map span so the content fits within that visible portion, then
-        // shift the center southward so markers render in the upper visible area.
         let visibleFraction = max(1 - overlayFraction, 0.3)
 
         if let station = viewModel.nearestStation {
@@ -579,11 +542,10 @@ struct MapContentView: View {
             let contentLat = (maxLat - minLat) + latMargin * 2
             let contentLon = (maxLon - minLon) + lonMargin * 2
 
-            // Expand the latitude span so the content occupies only the visible portion.
             let mapSpanLat = contentLat / visibleFraction
             let latOffset = mapSpanLat * overlayFraction / 2
 
-            let region = MKCoordinateRegion(
+            mapRegion = MKCoordinateRegion(
                 center: CLLocationCoordinate2D(
                     latitude: (minLat + maxLat) / 2 - latOffset,
                     longitude: (minLon + maxLon) / 2
@@ -593,25 +555,18 @@ struct MapContentView: View {
                     longitudeDelta: contentLon
                 )
             )
-            withAnimation(.easeInOut(duration: 0.5)) {
-                cameraPosition = .region(region)
-            }
         } else {
             let contentLat = 0.01
             let mapSpanLat = contentLat / visibleFraction
             let latOffset = mapSpanLat * overlayFraction / 2
 
-            withAnimation(.easeInOut(duration: 0.5)) {
-                cameraPosition = .region(
-                    MKCoordinateRegion(
-                        center: CLLocationCoordinate2D(
-                            latitude: userCoord.latitude - latOffset,
-                            longitude: userCoord.longitude
-                        ),
-                        span: MKCoordinateSpan(latitudeDelta: mapSpanLat, longitudeDelta: contentLat)
-                    )
-                )
-            }
+            mapRegion = MKCoordinateRegion(
+                center: CLLocationCoordinate2D(
+                    latitude: userCoord.latitude - latOffset,
+                    longitude: userCoord.longitude
+                ),
+                span: MKCoordinateSpan(latitudeDelta: mapSpanLat, longitudeDelta: contentLat)
+            )
         }
     }
 
