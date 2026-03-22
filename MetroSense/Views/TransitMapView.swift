@@ -8,7 +8,10 @@ struct TransitMapView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
-        mapView.mapType = .transit
+        let config = MKStandardMapConfiguration(emphasisStyle: .muted)
+        config.pointOfInterestFilter = MKPointOfInterestFilter(including: [.publicTransport])
+        config.showsTraffic = false
+        mapView.preferredConfiguration = config
         mapView.showsUserLocation = showsUserLocation
         mapView.showsCompass = true
         mapView.delegate = context.coordinator
