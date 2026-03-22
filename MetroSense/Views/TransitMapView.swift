@@ -5,10 +5,11 @@ struct TransitMapView: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion?
     var nearestStation: MetroStation?
     var showsUserLocation: Bool = true
+    var cameraResetToken: Int = 0
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
-        let config = MKStandardMapConfiguration(emphasisStyle: .muted)
+        let config = MKStandardMapConfiguration()
         config.pointOfInterestFilter = MKPointOfInterestFilter(including: [.publicTransport])
         config.showsTraffic = false
         mapView.preferredConfiguration = config
@@ -37,7 +38,12 @@ struct TransitMapView: UIViewRepresentable {
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.showsUserLocation = showsUserLocation
 
-        if let region = region, !mapView.region.isApproximatelyEqual(to: region) {
+        let forceReset = cameraResetToken != context.coordinator.lastResetToken
+        if forceReset {
+            context.coordinator.lastResetToken = cameraResetToken
+        }
+
+        if let region = region, forceReset || !mapView.region.isApproximatelyEqual(to: region) {
             let animated = context.coordinator.hasSetInitialRegion
             mapView.setRegion(region, animated: animated)
             context.coordinator.hasSetInitialRegion = true
@@ -70,6 +76,7 @@ struct TransitMapView: UIViewRepresentable {
 
     final class Coordinator: NSObject, MKMapViewDelegate {
         var hasSetInitialRegion = false
+        var lastResetToken: Int = 0
         private static let pulseViewTag = 1001
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {

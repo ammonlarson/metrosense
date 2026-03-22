@@ -7,6 +7,7 @@ struct MapContentView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var mapRegion: MKCoordinateRegion?
     @State private var lastCameraUpdateLocation: CLLocation?
+    @State private var cameraResetToken: Int = 0
 
     @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
     @State private var settingsVisible: Bool = false
@@ -178,7 +179,8 @@ struct MapContentView: View {
     private var mapLayer: some View {
         TransitMapView(
             region: $mapRegion,
-            nearestStation: viewModel.nearestStation
+            nearestStation: viewModel.nearestStation,
+            cameraResetToken: cameraResetToken
         )
         .ignoresSafeArea()
     }
@@ -504,6 +506,7 @@ struct MapContentView: View {
     private var resetCameraButton: some View {
         Button {
             lastCameraUpdateLocation = nil
+            cameraResetToken += 1
             updateCamera()
         } label: {
             Image(systemName: "location.fill")
