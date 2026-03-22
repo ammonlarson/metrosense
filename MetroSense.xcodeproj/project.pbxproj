@@ -21,6 +21,7 @@
 		C4F154BC3A49FB5E2314FF35 /* MetroLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCADA81F1831CC5803DB2113 /* MetroLine.swift */; };
 		C628CB165B841562784910FB /* NotificationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE37611856ABD7622C0C3BA8 /* NotificationSettings.swift */; };
 		D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */; };
+		E9F1EEBE43C0CB9188C774F4 /* TestNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679D07887772747157738ED3 /* TestNotificationsView.swift */; };
 		EB37E135E77FCACF2C70C068 /* MetroStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AEC0F64175BB303AD89638 /* MetroStation.swift */; };
 		FE5E1C6BB9ABAD0DAD64FF26 /* MetroViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B8BAB1520BB64FF777D1E86 /* MetroViewModel.swift */; };
 /* End PBXBuildFile section */
@@ -35,8 +36,9 @@
 		4DAE224E25AB5C6325640083 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5B8BAB1520BB64FF777D1E86 /* MetroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetroViewModel.swift; sourceTree = "<group>"; };
 		66DC1367451D3060AD2ADEAC /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		679D07887772747157738ED3 /* TestNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationsView.swift; sourceTree = "<group>"; };
 		76AE715724C3018308461364 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
-		9C2421502AA5169B997BE291 /* MetroSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetroSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C2421502AA5169B997BE291 /* MetroSense.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MetroSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A46816E662033897D01B62A6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B764777F71F980FF1A1C6979 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationFilterPickerView.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				A46816E662033897D01B62A6 /* SettingsView.swift */,
 				B764777F71F980FF1A1C6979 /* SplashScreen.swift */,
 				BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */,
+				679D07887772747157738ED3 /* TestNotificationsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -156,6 +159,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					F41A2E6F89DB32AEB68B769A = {
+						DevelopmentTeam = E5787F652X;
+					};
+				};
 			};
 			buildConfigurationList = E6DAD90C79BE7DC11B49D7F6 /* Build configuration list for PBXProject "MetroSense" */;
 			developmentRegion = en;
@@ -207,6 +215,7 @@
 				6FD5402AA4B21C8588F762FF /* SettingsView.swift in Sources */,
 				A3270A9E3DBDF7B9D145F2FA /* SplashScreen.swift in Sources */,
 				D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */,
+				E9F1EEBE43C0CB9188C774F4 /* TestNotificationsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,7 +283,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 5GSP7B436V;
+				DEVELOPMENT_TEAM = E5787F652X;
 				INFOPLIST_FILE = MetroSense/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -292,7 +301,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 5GSP7B436V;
+				DEVELOPMENT_TEAM = E5787F652X;
 				INFOPLIST_FILE = MetroSense/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

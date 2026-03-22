@@ -102,7 +102,7 @@ struct TestNotificationsView: View {
             let result = NotificationTestResult.evaluate(
                 settings: settings,
                 location: location,
-                speed: speed,
+                speed: speed ?? 0,
                 lastMovementNotificationTime: lastMovementNotificationTime
             )
             withAnimation {
