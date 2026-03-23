@@ -338,7 +338,7 @@ struct MapContentView: View {
                 .padding(.bottom, isLandscape ? 6 : 12)
 
             Text(tripStateLabel)
-                .font(isLandscape ? .headline : .title2.bold())
+                .font(isLandscape ? .headline.bold() : .title2.bold())
                 .foregroundStyle(.primary)
                 .padding(.bottom, 4)
 
@@ -346,6 +346,7 @@ struct MapContentView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
+                .lineLimit(isLandscape ? 2 : nil)
                 .padding(.horizontal)
                 .padding(.bottom, isLandscape ? 8 : 16)
         }
