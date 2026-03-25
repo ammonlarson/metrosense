@@ -97,7 +97,7 @@ struct MovementSettingsView: View {
                         )
                     }
                 }
-            } footer: {
+            } header: {
                 Text("Get notified when movement matching metro speed is detected.")
             }
         }
