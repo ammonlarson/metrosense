@@ -51,7 +51,7 @@ struct TestNotificationsView: View {
                     .frame(height: 12)
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 }
-            } footer: {
+            } header: {
                 Text("Check whether a notification would fire right now based on your current location and speed.")
             }
 

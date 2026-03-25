@@ -5,6 +5,7 @@ struct MapContentView: View {
     @ObservedObject var viewModel: MetroViewModel
     var onSettingsChanged: (NotificationSettings) -> Void
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var mapRegion: MKCoordinateRegion?
     @State private var lastCameraUpdateLocation: CLLocation?
     @State private var cameraResetToken: Int = 0
@@ -25,7 +26,7 @@ struct MapContentView: View {
     /// Height of the collapsed portion that stays visible (drag handle + status icon only).
     private static let collapsedVisibleHeight: CGFloat = 130
     /// Full overlay card height.
-    private static let overlayFullHeight: CGFloat = 340
+    private static let overlayFullHeight: CGFloat = 370
     /// Overlay height when settings categories are visible.
     private static let settingsOverlayHeight: CGFloat = 600
     /// Threshold to trigger a snap when dragging.
@@ -46,9 +47,32 @@ struct MapContentView: View {
         allStationNames = names.sorted()
     }
 
+    private var isLandscape: Bool {
+        verticalSizeClass == .compact
+    }
+
+    /// Height of the collapsed portion in landscape mode.
+    private static let landscapeCollapsedVisibleHeight: CGFloat = 100
+    /// Full overlay card height in landscape mode.
+    private static let landscapeOverlayFullHeight: CGFloat = 220
+    /// Overlay height when settings categories are visible in landscape.
+    private static let landscapeSettingsOverlayHeight: CGFloat = 400
+
+    private var currentCollapsedHeight: CGFloat {
+        isLandscape ? Self.landscapeCollapsedVisibleHeight : Self.collapsedVisibleHeight
+    }
+
+    private var currentFullHeight: CGFloat {
+        isLandscape ? Self.landscapeOverlayFullHeight : Self.overlayFullHeight
+    }
+
+    private var currentSettingsHeight: CGFloat {
+        isLandscape ? Self.landscapeSettingsOverlayHeight : Self.settingsOverlayHeight
+    }
+
     /// Total overlay height (background extends into safe area via ignoresSafeArea).
     private var totalOverlayHeight: CGFloat {
-        settingsVisible ? Self.settingsOverlayHeight : Self.overlayFullHeight
+        settingsVisible ? currentSettingsHeight : currentFullHeight
     }
 
     var body: some View {
@@ -199,70 +223,18 @@ struct MapContentView: View {
     private var overlayCard: some View {
         GeometryReader { proxy in
             let fullHeight = proxy.size.height
-            let collapseOffset = max(fullHeight - Self.collapsedVisibleHeight, 0)
+            let collapseOffset = max(fullHeight - currentCollapsedHeight, 0)
             let baseOffset = overlayExpanded ? 0 : collapseOffset
             let clampedDrag = min(max(dragOffset + baseOffset, 0), collapseOffset)
 
             VStack(spacing: 0) {
                 overlayHeader
 
-                Image(metroStatusImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 100)
-                    .padding(.top, 8)
-                    .padding(.bottom, 12)
-
-                Text(tripStateLabel)
-                    .font(.title2.bold())
-                    .foregroundStyle(.primary)
-                    .padding(.bottom, 4)
-
-                Text(tripStateDetail)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                    .padding(.bottom, 16)
-
-                Divider()
-                    .padding(.horizontal)
-
-                HStack {
-                    Image(systemName: "speedometer")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                    Text("Speed")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text(String(format: "%.0f km/h", viewModel.speedKMH))
-                        .font(.title3.monospacedDigit().bold())
+                if isLandscape {
+                    landscapeContent
+                } else {
+                    portraitContent
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
-
-                Divider()
-                    .padding(.horizontal)
-
-                HStack {
-                    Image(systemName: "tram.fill")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                    Text("Nearest Station")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(nearestStationLabel)
-                            .font(.title3.bold())
-                        Text(nearestStationDistance)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
 
                 if settingsVisible {
                     settingsCategories
@@ -310,6 +282,115 @@ struct MapContentView: View {
         }
         .frame(height: totalOverlayHeight)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: settingsVisible)
+    }
+
+    // MARK: - Portrait Content
+
+    private var portraitContent: some View {
+        VStack(spacing: 0) {
+            statusSection
+
+            Divider()
+                .padding(.horizontal)
+
+            speedSection
+
+            Divider()
+                .padding(.horizontal)
+
+            nearestStationSection
+        }
+    }
+
+    // MARK: - Landscape Content
+
+    private var landscapeContent: some View {
+        HStack(alignment: .top, spacing: 0) {
+            VStack(spacing: 0) {
+                statusSection
+            }
+            .frame(maxWidth: .infinity)
+
+            Divider()
+                .padding(.vertical, 8)
+
+            VStack(spacing: 0) {
+                speedSection
+
+                Divider()
+                    .padding(.horizontal)
+
+                nearestStationSection
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    // MARK: - Content Sections
+
+    private var statusSection: some View {
+        let compactLandscape = isLandscape && settingsVisible
+        return VStack(spacing: 0) {
+            Image(metroStatusImage)
+                .resizable()
+                .scaledToFit()
+                .frame(height: compactLandscape ? 36 : (isLandscape ? 60 : 100))
+                .padding(.top, compactLandscape ? 4 : 8)
+                .padding(.bottom, compactLandscape ? 2 : (isLandscape ? 6 : 12))
+
+            Text(tripStateLabel)
+                .font(isLandscape ? .headline.bold() : .title2.bold())
+                .foregroundStyle(.primary)
+                .padding(.bottom, compactLandscape ? 2 : 4)
+
+            Text(tripStateDetail)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(isLandscape ? 2 : nil)
+                .padding(.horizontal)
+                .padding(.bottom, compactLandscape ? 4 : (isLandscape ? 8 : 16))
+        }
+    }
+
+    private var speedSection: some View {
+        let compactLandscape = isLandscape && settingsVisible
+        return HStack {
+            Image(systemName: "speedometer")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+            Text("Speed")
+                .font(.body)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text(String(format: "%.0f km/h", viewModel.speedKMH))
+                .font(.title3.monospacedDigit().bold())
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, compactLandscape ? 8 : 14)
+    }
+
+    private var nearestStationSection: some View {
+        let compactLandscape = isLandscape && settingsVisible
+        return HStack {
+            Image(systemName: "tram.fill")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+            Text("Nearest Station")
+                .font(.body)
+                .foregroundStyle(.secondary)
+            Spacer()
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(nearestStationLabel)
+                    .font(.title3.bold())
+                Text(nearestStationDistance)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, compactLandscape ? 8 : 14)
     }
 
     private var overlayHeader: some View {
@@ -389,83 +470,76 @@ struct MapContentView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 4)
 
-            Button {
+            settingsRow(
+                icon: "location.circle",
+                title: "Metro Proximity",
+                subtitle: proximityStatusText
+            ) {
                 showingProximitySettings = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "location.circle")
-                        .font(.title3)
-                        .foregroundStyle(.blue)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Metro Proximity")
-                            .font(.body)
-                            .foregroundStyle(.primary)
-                        Text(proximityStatusText)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption.bold())
-                        .foregroundStyle(.tertiary)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
             }
 
             Divider()
                 .padding(.horizontal)
 
-            Button {
+            settingsRow(
+                icon: "figure.run",
+                title: "Movement Detection",
+                subtitle: movementStatusText
+            ) {
                 showingMovementSettings = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "figure.run")
-                        .font(.title3)
-                        .foregroundStyle(.blue)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Movement Detection")
-                            .font(.body)
-                            .foregroundStyle(.primary)
-                        Text(movementStatusText)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption.bold())
-                        .foregroundStyle(.tertiary)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
             }
 
             Divider()
                 .padding(.horizontal)
 
-            Button {
+            settingsRow(
+                icon: "bell.badge",
+                title: "Test Notifications",
+                subtitle: "Check if alerts would fire now"
+            ) {
                 showingTestNotifications = true
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "bell.badge")
-                        .font(.title3)
-                        .foregroundStyle(.blue)
+            }
+        }
+    }
+
+    private func settingsRow(
+        icon: String,
+        title: String,
+        subtitle: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.title3)
+                    .foregroundStyle(.blue)
+                if isLandscape {
+                    Text(title)
+                        .font(.body)
+                        .foregroundStyle(.primary)
+                    Text("·")
+                        .foregroundStyle(.tertiary)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                } else {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Test Notifications")
+                        Text(title)
                             .font(.body)
                             .foregroundStyle(.primary)
-                        Text("Check if alerts would fire now")
+                        Text(subtitle)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.caption.bold())
-                        .foregroundStyle(.tertiary)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.bold())
+                    .foregroundStyle(.tertiary)
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, isLandscape ? 6 : 10)
         }
     }
 
@@ -498,7 +572,7 @@ struct MapContentView: View {
     /// The vertical offset applied to the overlay card content, mirrored here
     /// so the reset button tracks the overlay during drag and snap animations.
     private var overlayOffset: CGFloat {
-        let collapseOffset = max(totalOverlayHeight - Self.collapsedVisibleHeight, 0)
+        let collapseOffset = max(totalOverlayHeight - currentCollapsedHeight, 0)
         let baseOffset = overlayExpanded ? 0 : collapseOffset
         return min(max(dragOffset + baseOffset, 0), collapseOffset)
     }
@@ -524,11 +598,11 @@ struct MapContentView: View {
         guard screenHeight > 0 else { return 0 }
         let visibleOverlayHeight: CGFloat
         if settingsVisible {
-            visibleOverlayHeight = Self.settingsOverlayHeight + bottomSafeAreaInset
+            visibleOverlayHeight = currentSettingsHeight + bottomSafeAreaInset
         } else if overlayExpanded {
-            visibleOverlayHeight = Self.overlayFullHeight + bottomSafeAreaInset
+            visibleOverlayHeight = currentFullHeight + bottomSafeAreaInset
         } else {
-            visibleOverlayHeight = Self.collapsedVisibleHeight
+            visibleOverlayHeight = currentCollapsedHeight
         }
         return visibleOverlayHeight / screenHeight
     }

@@ -32,7 +32,7 @@ struct ProximitySettingsView: View {
                         allStationNames: allStationNames
                     )
                 }
-            } footer: {
+            } header: {
                 Text("Get notified when you are near a metro station.")
             }
         }
