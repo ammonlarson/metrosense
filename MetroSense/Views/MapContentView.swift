@@ -79,7 +79,9 @@ struct MapContentView: View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {
                 mapLayer
-                if viewModel.isUsingDegradedLocation {
+                if viewModel.isSignalLost {
+                    signalLostBanner
+                } else if viewModel.isUsingDegradedLocation {
                     degradedBanner
                 }
                 VStack(spacing: 12) {
@@ -567,6 +569,26 @@ struct MapContentView: View {
         .padding(.top, 8)
     }
 
+    private var signalLostBanner: some View {
+        VStack {
+            HStack(spacing: 6) {
+                Image(systemName: "location.slash.fill")
+                    .foregroundStyle(.red)
+                Text("GPS signal unavailable")
+                    .font(.footnote.bold())
+                Spacer()
+                Text("Searching…")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(10)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+            .padding(.horizontal, 16)
+            Spacer()
+        }
+        .padding(.top, 8)
+    }
+
     // MARK: - Reset Camera Button
 
     /// The vertical offset applied to the overlay card content, mirrored here
@@ -670,6 +692,18 @@ struct MapContentView: View {
     }
 
     private var tripStateDetail: String {
+        if viewModel.isSignalLost {
+            switch viewModel.tripState {
+            case .idle:
+                return "GPS signal unavailable"
+            case .atStation:
+                return "GPS signal lost — last known position"
+            case .onMetro(let l, let from, _):
+                return "\(l.rawValue) from \(from.name) · GPS signal lost"
+            case .arrived(let l, let from, let to):
+                return "\(l.rawValue): \(from.name) → \(to.name)"
+            }
+        }
         switch viewModel.tripState {
         case .idle:
             return "Move to a station to begin detection"

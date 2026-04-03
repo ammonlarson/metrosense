@@ -6,14 +6,18 @@ final class LocationService: NSObject, ObservableObject {
     @Published var currentSpeed: Double = 0  // m/s
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var isUsingDegradedLocation: Bool = false
+    @Published var isSignalLost: Bool = true
     @Published var heading: CLHeading?
     @Published var error: String?
 
     private static let accuracyThreshold: Double = 200
     private static let fallbackAccuracyThreshold: Double = 500
     private static let stalenessLimit: TimeInterval = -30
+    /// Duration without a valid location update before declaring signal lost.
+    static let signalLostTimeout: TimeInterval = 15
 
     private let manager = CLLocationManager()
+    private var signalLostTimer: Timer?
 
     override init() {
         super.init()
@@ -34,11 +38,26 @@ final class LocationService: NSObject, ObservableObject {
     func startUpdating() {
         manager.startUpdatingLocation()
         manager.startUpdatingHeading()
+        resetSignalLostTimer()
     }
 
     func stopUpdating() {
         manager.stopUpdatingLocation()
         manager.stopUpdatingHeading()
+        signalLostTimer?.invalidate()
+        signalLostTimer = nil
+    }
+
+    private func resetSignalLostTimer() {
+        signalLostTimer?.invalidate()
+        signalLostTimer = Timer.scheduledTimer(
+            withTimeInterval: Self.signalLostTimeout,
+            repeats: false
+        ) { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.isSignalLost = true
+            }
+        }
     }
 }
 
@@ -74,6 +93,8 @@ extension LocationService: CLLocationManagerDelegate {
         guard !isStale, (!isTooInaccurate || usingFallback) else { return }
 
         isUsingDegradedLocation = usingFallback
+        isSignalLost = false
+        resetSignalLostTimer()
         error = nil
         currentLocation = location
         // CLLocation.speed is -1 when unavailable; clamp to 0
