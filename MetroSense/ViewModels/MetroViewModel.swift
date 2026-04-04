@@ -9,6 +9,7 @@ final class MetroViewModel: ObservableObject {
     @Published var nearestStationDistance: CLLocationDistance?
     @Published var speedKMH: Double = 0
     @Published var isUsingDegradedLocation: Bool = false
+    @Published var isSignalLost: Bool = true
     @Published var settings: NotificationSettings
 
     var currentLocation: CLLocation? { locationService.currentLocation }
@@ -53,6 +54,10 @@ final class MetroViewModel: ObservableObject {
         locationService.$isUsingDegradedLocation
             .receive(on: DispatchQueue.main)
             .assign(to: &$isUsingDegradedLocation)
+
+        locationService.$isSignalLost
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$isSignalLost)
     }
 
     private func evaluate(location: CLLocation, speed: Double) {
