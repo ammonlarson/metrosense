@@ -189,7 +189,8 @@ struct MapContentView: View {
                     settings: $viewModel.settings,
                     location: viewModel.currentLocation,
                     speed: viewModel.currentSpeed,
-                    lastMovementNotificationTime: viewModel.lastMovementNotificationTime
+                    lastMovementNotificationTime: viewModel.lastMovementNotificationTime,
+                    lastProximityNotificationTime: viewModel.lastProximityNotificationTime
                 )
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {

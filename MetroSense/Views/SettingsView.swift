@@ -14,12 +14,14 @@ struct SettingsView: View {
     private let currentLocation: CLLocation?
     private let currentSpeed: Double
     private let lastMovementNotificationTime: Date?
+    private let lastProximityNotificationTime: Date?
 
     init(
         settings: NotificationSettings = .load(),
         currentLocation: CLLocation? = nil,
         currentSpeed: Double = 0,
         lastMovementNotificationTime: Date? = nil,
+        lastProximityNotificationTime: Date? = nil,
         onSettingsChanged: @escaping (NotificationSettings) -> Void = { $0.save() }
     ) {
         _settings = State(initialValue: settings)
@@ -27,6 +29,7 @@ struct SettingsView: View {
         self.currentLocation = currentLocation
         self.currentSpeed = currentSpeed
         self.lastMovementNotificationTime = lastMovementNotificationTime
+        self.lastProximityNotificationTime = lastProximityNotificationTime
 
         var seen = Set<String>()
         var names: [String] = []
@@ -137,7 +140,7 @@ struct SettingsView: View {
                     Text("min")
                         .foregroundStyle(.secondary)
                 }
-                Text("Minimum time between repeated movement alerts.")
+                Text("Minimum time between repeated alerts (applies to both proximity and movement).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -227,7 +230,8 @@ struct SettingsView: View {
                 settings: settings,
                 location: currentLocation,
                 speed: currentSpeed,
-                lastMovementNotificationTime: lastMovementNotificationTime
+                lastMovementNotificationTime: lastMovementNotificationTime,
+                lastProximityNotificationTime: lastProximityNotificationTime
             )
             withAnimation {
                 testResult = result
@@ -276,12 +280,33 @@ struct NotificationTestResult: Equatable {
         settings: NotificationSettings,
         location: CLLocation?,
         speed: Double,
-        lastMovementNotificationTime: Date? = nil
+        lastMovementNotificationTime: Date? = nil,
+        lastProximityNotificationTime: Date? = nil
     ) -> NotificationTestResult {
         let proximityResult: (Bool, String)
         if !settings.proximityEnabled {
             proximityResult = (false, "Proximity alerts are disabled.")
         } else if let location {
+            let proximityCooldownElapsed: Bool
+            var proximityCooldownNote = ""
+            if settings.movementCooldownSeconds > 0, let lastTime = lastProximityNotificationTime {
+                let elapsed = Date().timeIntervalSince(lastTime)
+                let remaining = settings.movementCooldownSeconds - elapsed
+                if remaining > 0 {
+                    proximityCooldownElapsed = false
+                    let mins = Int(remaining / 60)
+                    let secs = Int(remaining.truncatingRemainder(dividingBy: 60))
+                    proximityCooldownNote = " Cooldown active (\(mins)m \(secs)s remaining)."
+                } else {
+                    proximityCooldownElapsed = true
+                }
+            } else {
+                proximityCooldownElapsed = true
+            }
+
+            if !proximityCooldownElapsed {
+                proximityResult = (false, "Proximity alerts suppressed by cooldown.\(proximityCooldownNote)")
+            } else {
             let accuracy = location.horizontalAccuracy
             let allStations = MetroLine.all.flatMap { $0.stations }
 
@@ -327,6 +352,7 @@ struct NotificationTestResult: Equatable {
                         proximityResult = (true, "Near: \(names)")
                     }
                 }
+            }
             }
         } else {
             proximityResult = (false, "Location unavailable.")
