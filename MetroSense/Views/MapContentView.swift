@@ -56,8 +56,6 @@ struct MapContentView: View {
     private static let landscapeCollapsedVisibleHeight: CGFloat = 100
     /// Full overlay card height in landscape mode.
     private static let landscapeOverlayFullHeight: CGFloat = 220
-    /// Overlay height when settings categories are visible in landscape.
-    private static let landscapeSettingsOverlayHeight: CGFloat = 400
 
     private var currentCollapsedHeight: CGFloat {
         isLandscape ? Self.landscapeCollapsedVisibleHeight : Self.collapsedVisibleHeight
@@ -67,12 +65,10 @@ struct MapContentView: View {
         isLandscape ? Self.landscapeOverlayFullHeight : Self.overlayFullHeight
     }
 
+    /// In landscape, settings replace the main content instead of appending
+    /// below it, so we reuse the full overlay height rather than growing taller.
     private var currentSettingsHeight: CGFloat {
-        if isLandscape {
-            let maxHeight = max(screenHeight - 20, Self.landscapeOverlayFullHeight)
-            return min(Self.landscapeSettingsOverlayHeight, maxHeight)
-        }
-        return Self.settingsOverlayHeight
+        isLandscape ? Self.landscapeOverlayFullHeight : Self.settingsOverlayHeight
     }
 
     /// Total overlay height (background extends into safe area via ignoresSafeArea).
@@ -242,15 +238,18 @@ struct MapContentView: View {
             VStack(spacing: 0) {
                 overlayHeader
 
-                if isLandscape {
+                if isLandscape && settingsVisible {
+                    settingsCategories
+                        .transition(.opacity)
+                } else if isLandscape {
                     landscapeContent
                 } else {
                     portraitContent
-                }
 
-                if settingsVisible {
-                    settingsCategories
-                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    if settingsVisible {
+                        settingsCategories
+                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    }
                 }
 
                 Spacer(minLength: 0)
@@ -342,19 +341,18 @@ struct MapContentView: View {
     // MARK: - Content Sections
 
     private var statusSection: some View {
-        let compactLandscape = isLandscape && settingsVisible
-        return VStack(spacing: 0) {
+        VStack(spacing: 0) {
             Image(metroStatusImage)
                 .resizable()
                 .scaledToFit()
-                .frame(height: compactLandscape ? 36 : (isLandscape ? 60 : 100))
-                .padding(.top, compactLandscape ? 4 : 8)
-                .padding(.bottom, compactLandscape ? 2 : (isLandscape ? 6 : 12))
+                .frame(height: isLandscape ? 60 : 100)
+                .padding(.top, 8)
+                .padding(.bottom, isLandscape ? 6 : 12)
 
             Text(tripStateLabel)
                 .font(isLandscape ? .headline.bold() : .title2.bold())
                 .foregroundStyle(.primary)
-                .padding(.bottom, compactLandscape ? 2 : 4)
+                .padding(.bottom, 4)
 
             Text(tripStateDetail)
                 .font(.subheadline)
@@ -362,13 +360,12 @@ struct MapContentView: View {
                 .multilineTextAlignment(.center)
                 .lineLimit(isLandscape ? 2 : nil)
                 .padding(.horizontal)
-                .padding(.bottom, compactLandscape ? 4 : (isLandscape ? 8 : 16))
+                .padding(.bottom, isLandscape ? 8 : 16)
         }
     }
 
     private var speedSection: some View {
-        let compactLandscape = isLandscape && settingsVisible
-        return HStack {
+        HStack {
             Image(systemName: "speedometer")
                 .font(.title3)
                 .foregroundStyle(.secondary)
@@ -380,12 +377,11 @@ struct MapContentView: View {
                 .font(.title3.monospacedDigit().bold())
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, compactLandscape ? 8 : 14)
+        .padding(.vertical, 14)
     }
 
     private var nearestStationSection: some View {
-        let compactLandscape = isLandscape && settingsVisible
-        return HStack {
+        HStack {
             Image(systemName: "tram.fill")
                 .font(.title3)
                 .foregroundStyle(.secondary)
@@ -402,7 +398,7 @@ struct MapContentView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, compactLandscape ? 8 : 14)
+        .padding(.vertical, 14)
     }
 
     private var overlayHeader: some View {
