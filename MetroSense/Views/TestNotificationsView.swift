@@ -2,7 +2,7 @@ import CoreLocation
 import SwiftUI
 
 struct TestNotificationsView: View {
-    let settings: NotificationSettings
+    @Binding var settings: NotificationSettings
     let location: CLLocation?
     let speed: Double?
     let lastMovementNotificationTime: Date?
@@ -14,6 +14,26 @@ struct TestNotificationsView: View {
 
     var body: some View {
         Form {
+            Section {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Cooldown")
+                        Spacer()
+                        TextField("min", value: $settings.movementCooldownMinutes, format: .number)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 80)
+                        Text("min")
+                            .foregroundStyle(.secondary)
+                    }
+                    Text("Minimum time between repeated movement alerts.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Settings")
+            }
+
             Section {
                 Button {
                     runTest()
@@ -84,8 +104,13 @@ struct TestNotificationsView: View {
                 .transition(.opacity)
             }
         }
-        .navigationTitle("Test Notifications")
+        .navigationTitle("Notifications")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: settings) { _, newValue in
+            if newValue.isValid {
+                newValue.save()
+            }
+        }
     }
 
     private func runTest() {

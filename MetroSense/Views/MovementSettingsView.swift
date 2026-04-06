@@ -66,22 +66,6 @@ struct MovementSettingsView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text("Cooldown")
-                            Spacer()
-                            TextField("min", value: $settings.movementCooldownMinutes, format: .number)
-                                .keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing)
-                                .frame(width: 80)
-                            Text("min")
-                                .foregroundStyle(.secondary)
-                        }
-                        Text("Minimum time between repeated movement alerts.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
                         Toggle("Require Start at Station", isOn: $settings.requireStartAtStation)
                             .tint(.blue)
                         Text("Only alert if movement began near a metro station.")

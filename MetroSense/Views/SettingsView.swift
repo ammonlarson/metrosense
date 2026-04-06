@@ -44,7 +44,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 categoriesSection
-                testSection
+                notificationsSection
             }
             .navigationTitle("Notification Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -122,10 +122,26 @@ struct SettingsView: View {
         settings.movementEnabled ? "On — \(Int(settings.minimumSpeedKMH))–\(Int(settings.maximumSpeedKMH)) km/h" : "Off"
     }
 
-    // MARK: - Test Section
+    // MARK: - Notifications Section
 
-    private var testSection: some View {
+    private var notificationsSection: some View {
         Section {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text("Cooldown")
+                    Spacer()
+                    TextField("min", value: $settings.movementCooldownMinutes, format: .number)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                    Text("min")
+                        .foregroundStyle(.secondary)
+                }
+                Text("Minimum time between repeated movement alerts.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Button {
                 runTest()
             } label: {
@@ -190,7 +206,7 @@ struct SettingsView: View {
                 }
             }
         } header: {
-            Text("Test")
+            Text("Notifications")
         } footer: {
             Text("Check whether a notification would fire right now based on your current location and speed.")
         }

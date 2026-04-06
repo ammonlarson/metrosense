@@ -186,7 +186,7 @@ struct MapContentView: View {
         .sheet(isPresented: $showingTestNotifications) {
             NavigationStack {
                 TestNotificationsView(
-                    settings: viewModel.settings,
+                    settings: $viewModel.settings,
                     location: viewModel.currentLocation,
                     speed: viewModel.currentSpeed,
                     lastMovementNotificationTime: viewModel.lastMovementNotificationTime
@@ -523,8 +523,8 @@ struct MapContentView: View {
 
             settingsRow(
                 icon: "bell.badge",
-                title: "Test Notifications",
-                subtitle: "Check if alerts would fire now"
+                title: "Notifications",
+                subtitle: "Cooldown & test alerts"
             ) {
                 showingTestNotifications = true
             }
