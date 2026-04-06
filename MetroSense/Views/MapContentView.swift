@@ -186,7 +186,7 @@ struct MapContentView: View {
         .sheet(isPresented: $showingTestNotifications) {
             NavigationStack {
                 TestNotificationsView(
-                    settings: viewModel.settings,
+                    settings: $viewModel.settings,
                     location: viewModel.currentLocation,
                     speed: viewModel.currentSpeed,
                     lastMovementNotificationTime: viewModel.lastMovementNotificationTime
