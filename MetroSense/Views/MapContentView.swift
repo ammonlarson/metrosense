@@ -6,6 +6,8 @@ struct MapContentView: View {
     var onSettingsChanged: (NotificationSettings) -> Void
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @ScaledMetric(relativeTo: .title2) private var statusImageHeight: CGFloat = 100
+    @ScaledMetric(relativeTo: .body) private var sectionVerticalPadding: CGFloat = 14
     @State private var mapRegion: MKCoordinateRegion?
     @State private var lastCameraUpdateLocation: CLLocation?
     @State private var cameraResetToken: Int = 0
@@ -24,14 +26,14 @@ struct MapContentView: View {
 
     private let allStationNames: [String]
 
-    /// Height of the collapsed portion that stays visible (drag handle + status icon only).
-    private static let collapsedVisibleHeight: CGFloat = 130
-    /// Full overlay card height.
-    private static let overlayFullHeight: CGFloat = 370
-    /// Overlay height when settings categories are visible.
-    private static let settingsOverlayHeight: CGFloat = 600
+    /// Minimum height always kept visible for the map above the overlay.
+    private static let minimumMapHeight: CGFloat = 120
     /// Threshold to trigger a snap when dragging.
     private static let snapThreshold: CGFloat = 80
+    /// Base heights used as starting points before screen-relative capping.
+    private static let baseCollapsedHeight: CGFloat = 130
+    private static let baseFullHeight: CGFloat = 370
+    private static let baseSettingsHeight: CGFloat = 600
 
     init(viewModel: MetroViewModel, onSettingsChanged: @escaping (NotificationSettings) -> Void) {
         self.viewModel = viewModel
@@ -52,23 +54,31 @@ struct MapContentView: View {
         verticalSizeClass == .compact
     }
 
-    /// Height of the collapsed portion in landscape mode.
-    private static let landscapeCollapsedVisibleHeight: CGFloat = 100
-    /// Full overlay card height in landscape mode.
-    private static let landscapeOverlayFullHeight: CGFloat = 220
+    /// Base heights for landscape mode.
+    private static let baseLandscapeCollapsedHeight: CGFloat = 100
+    private static let baseLandscapeFullHeight: CGFloat = 220
+
+    /// Maximum overlay height that still leaves enough map visible.
+    private var maxOverlayHeight: CGFloat {
+        guard screenHeight > 0 else { return 600 }
+        return screenHeight - Self.minimumMapHeight
+    }
 
     private var currentCollapsedHeight: CGFloat {
-        isLandscape ? Self.landscapeCollapsedVisibleHeight : Self.collapsedVisibleHeight
+        let base = isLandscape ? Self.baseLandscapeCollapsedHeight : Self.baseCollapsedHeight
+        return min(base, maxOverlayHeight)
     }
 
     private var currentFullHeight: CGFloat {
-        isLandscape ? Self.landscapeOverlayFullHeight : Self.overlayFullHeight
+        let base = isLandscape ? Self.baseLandscapeFullHeight : Self.baseFullHeight
+        return min(base, maxOverlayHeight)
     }
 
     /// In landscape, settings replace the main content instead of appending
     /// below it, so we reuse the full overlay height rather than growing taller.
     private var currentSettingsHeight: CGFloat {
-        isLandscape ? Self.landscapeOverlayFullHeight : Self.settingsOverlayHeight
+        let base = isLandscape ? Self.baseLandscapeFullHeight : Self.baseSettingsHeight
+        return min(base, maxOverlayHeight)
     }
 
     /// Total overlay height (background extends into safe area via ignoresSafeArea).
@@ -238,19 +248,24 @@ struct MapContentView: View {
             VStack(spacing: 0) {
                 overlayHeader
 
-                if isLandscape && settingsVisible {
-                    settingsCategories
-                        .transition(.opacity)
-                } else if isLandscape {
-                    landscapeContent
-                } else {
-                    portraitContent
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        if isLandscape && settingsVisible {
+                            settingsCategories
+                                .transition(.opacity)
+                        } else if isLandscape {
+                            landscapeContent
+                        } else {
+                            portraitContent
 
-                    if settingsVisible {
-                        settingsCategories
-                            .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            if settingsVisible {
+                                settingsCategories
+                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                            }
+                        }
                     }
                 }
+                .scrollBounceBehavior(.basedOnSize)
 
                 Spacer(minLength: 0)
             }
@@ -261,35 +276,6 @@ struct MapContentView: View {
                     .ignoresSafeArea(edges: .bottom)
             }
             .offset(y: clampedDrag)
-            .gesture(
-                DragGesture()
-                    .onChanged { value in
-                        dragOffset = value.translation.height
-                    }
-                    .onEnded { value in
-                        let projected = value.predictedEndTranslation.height
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                            if settingsVisible {
-                                if projected > Self.snapThreshold {
-                                    settingsVisible = false
-                                }
-                            } else if overlayExpanded {
-                                if projected > Self.snapThreshold {
-                                    overlayExpanded = false
-                                } else if projected < -Self.snapThreshold {
-                                    settingsVisible = true
-                                }
-                            } else {
-                                if projected < -Self.snapThreshold {
-                                    overlayExpanded = true
-                                }
-                            }
-                            dragOffset = 0
-                        } completion: {
-                            showSettingsIcon = !settingsVisible
-                        }
-                    }
-            )
         }
         .frame(height: totalOverlayHeight)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: settingsVisible)
@@ -345,7 +331,7 @@ struct MapContentView: View {
             Image(metroStatusImage)
                 .resizable()
                 .scaledToFit()
-                .frame(height: isLandscape ? 60 : 100)
+                .frame(height: isLandscape ? min(statusImageHeight * 0.6, 80) : min(statusImageHeight, 140))
                 .padding(.top, 8)
                 .padding(.bottom, isLandscape ? 6 : 12)
 
@@ -377,7 +363,7 @@ struct MapContentView: View {
                 .font(.title3.monospacedDigit().bold())
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.vertical, sectionVerticalPadding)
     }
 
     private var nearestStationSection: some View {
@@ -398,7 +384,7 @@ struct MapContentView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.vertical, sectionVerticalPadding)
     }
 
     private var overlayHeader: some View {
@@ -443,6 +429,35 @@ struct MapContentView: View {
             }
             .padding(.trailing, 8)
         }
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    dragOffset = value.translation.height
+                }
+                .onEnded { value in
+                    let projected = value.predictedEndTranslation.height
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        if settingsVisible {
+                            if projected > Self.snapThreshold {
+                                settingsVisible = false
+                            }
+                        } else if overlayExpanded {
+                            if projected > Self.snapThreshold {
+                                overlayExpanded = false
+                            } else if projected < -Self.snapThreshold {
+                                settingsVisible = true
+                            }
+                        } else {
+                            if projected < -Self.snapThreshold {
+                                overlayExpanded = true
+                            }
+                        }
+                        dragOffset = 0
+                    } completion: {
+                        showSettingsIcon = !settingsVisible
+                    }
+                }
+        )
     }
 
     private var dragHandle: some View {
@@ -478,13 +493,7 @@ struct MapContentView: View {
                 .padding(.top, isLandscape ? 6 : 12)
                 .padding(.bottom, isLandscape ? 2 : 4)
 
-            if isLandscape {
-                ScrollView(.vertical, showsIndicators: false) {
-                    settingsCategoryRows
-                }
-            } else {
-                settingsCategoryRows
-            }
+            settingsCategoryRows
         }
     }
 
