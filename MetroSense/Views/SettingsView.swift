@@ -178,10 +178,10 @@ struct SettingsView: View {
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 } else if let result = testResult {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Image(systemName: result.proximityWouldFire ? "checkmark.circle.fill" : "xmark.circle.fill")
-                            .foregroundStyle(result.proximityWouldFire ? .green : .red)
+                        Image(systemName: result.proximityState.icon)
+                            .foregroundStyle(result.proximityState.color)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(result.proximityWouldFire ? "Proximity: Would fire" : "Proximity: Would not fire")
+                            Text(result.proximityState.label(for: "Proximity"))
                                 .foregroundStyle(.primary)
                             Text(result.proximityDetail)
                                 .font(.caption)
@@ -193,10 +193,10 @@ struct SettingsView: View {
                 if let result = testResult {
                     Group {
                         HStack(alignment: .firstTextBaseline, spacing: 8) {
-                            Image(systemName: result.movementWouldFire ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                .foregroundStyle(result.movementWouldFire ? .green : .red)
+                            Image(systemName: result.movementState.icon)
+                                .foregroundStyle(result.movementState.color)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(result.movementWouldFire ? "Movement: Would fire" : "Movement: Would not fire")
+                                Text(result.movementState.label(for: "Movement"))
                                     .foregroundStyle(.primary)
                                 Text(result.movementDetail)
                                     .font(.caption)
@@ -269,11 +269,46 @@ struct SettingsView: View {
 
 // MARK: - Notification Test Result
 
+enum NotificationTestFireState: Equatable {
+    case wouldFire
+    case wouldNotFire
+    case cooldownBlocked(remaining: TimeInterval)
+
+    var icon: String {
+        switch self {
+        case .wouldFire: "checkmark.circle.fill"
+        case .wouldNotFire: "xmark.circle.fill"
+        case .cooldownBlocked: "clock.badge.exclamationmark.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .wouldFire: .green
+        case .wouldNotFire: .red
+        case .cooldownBlocked: .orange
+        }
+    }
+
+    func label(for category: String) -> String {
+        switch self {
+        case .wouldFire:
+            "\(category): Would fire"
+        case .wouldNotFire:
+            "\(category): Would not fire"
+        case .cooldownBlocked(let remaining):
+            let mins = Int(remaining / 60)
+            let secs = Int(remaining.truncatingRemainder(dividingBy: 60))
+            return "\(category): Blocked by cooldown (\(mins)m \(secs)s remaining)"
+        }
+    }
+}
+
 struct NotificationTestResult: Equatable {
     let timestamp: Date
-    let proximityWouldFire: Bool
+    let proximityState: NotificationTestFireState
     let proximityDetail: String
-    let movementWouldFire: Bool
+    let movementState: NotificationTestFireState
     let movementDetail: String
 
     static func evaluate(
@@ -283,58 +318,44 @@ struct NotificationTestResult: Equatable {
         lastMovementNotificationTime: Date? = nil,
         lastProximityNotificationTime: Date? = nil
     ) -> NotificationTestResult {
-        let proximityResult: (Bool, String)
-        if !settings.proximityEnabled {
-            proximityResult = (false, "Proximity alerts are disabled.")
-        } else if let location {
-            let proximityCooldownElapsed: Bool
-            var proximityCooldownNote = ""
-            if settings.movementCooldownSeconds > 0, let lastTime = lastProximityNotificationTime {
-                let elapsed = Date().timeIntervalSince(lastTime)
-                let remaining = settings.movementCooldownSeconds - elapsed
-                if remaining > 0 {
-                    proximityCooldownElapsed = false
-                    let mins = Int(remaining / 60)
-                    let secs = Int(remaining.truncatingRemainder(dividingBy: 60))
-                    proximityCooldownNote = " Cooldown active (\(mins)m \(secs)s remaining)."
-                } else {
-                    proximityCooldownElapsed = true
-                }
-            } else {
-                proximityCooldownElapsed = true
-            }
+        let proximityState: NotificationTestFireState
+        let proximityDetail: String
 
-            if !proximityCooldownElapsed {
-                proximityResult = (false, "Proximity alerts suppressed by cooldown.\(proximityCooldownNote)")
-            } else {
+        if !settings.proximityEnabled {
+            proximityState = .wouldNotFire
+            proximityDetail = "Proximity alerts are disabled."
+        } else if let location {
+            let cooldownRemaining = Self.cooldownRemaining(
+                cooldownSeconds: settings.movementCooldownSeconds,
+                lastNotificationTime: lastProximityNotificationTime
+            )
+
             let accuracy = location.horizontalAccuracy
             let allStations = MetroLine.all.flatMap { $0.stations }
 
             if accuracy > settings.proximityRadius {
+                proximityState = .wouldNotFire
                 let closest = allStations.min { $0.distance(from: location) < $1.distance(from: location) }
-                let detail: String
                 if let closest {
                     let dist = Int(closest.distance(from: location))
-                    detail = "GPS accuracy (±\(Int(accuracy))m) exceeds radius (\(Int(settings.proximityRadius))m). Nearest: \(closest.name) (\(dist)m). Proximity skipped."
+                    proximityDetail = "GPS accuracy (±\(Int(accuracy))m) exceeds radius (\(Int(settings.proximityRadius))m). Nearest: \(closest.name) (\(dist)m). Proximity skipped."
                 } else {
-                    detail = "GPS accuracy (±\(Int(accuracy))m) exceeds radius (\(Int(settings.proximityRadius))m). Proximity skipped."
+                    proximityDetail = "GPS accuracy (±\(Int(accuracy))m) exceeds radius (\(Int(settings.proximityRadius))m). Proximity skipped."
                 }
-                proximityResult = (false, detail)
             } else {
                 let stationsInRange = allStations.filter {
                     ($0.distance(from: location) + accuracy) <= settings.proximityRadius
                 }
 
                 if stationsInRange.isEmpty {
+                    proximityState = .wouldNotFire
                     let closest = allStations.min { $0.distance(from: location) < $1.distance(from: location) }
-                    let detail: String
                     if let closest {
                         let dist = Int(closest.distance(from: location))
-                        detail = "No stations within \(Int(settings.proximityRadius))m (±\(Int(accuracy))m accuracy). Nearest: \(closest.name) (\(dist)m away)."
+                        proximityDetail = "No stations within \(Int(settings.proximityRadius))m (±\(Int(accuracy))m accuracy). Nearest: \(closest.name) (\(dist)m away)."
                     } else {
-                        detail = "No stations within \(Int(settings.proximityRadius))m."
+                        proximityDetail = "No stations within \(Int(settings.proximityRadius))m."
                     }
-                    proximityResult = (false, detail)
                 } else {
                     let matchingStations: [MetroStation]
                     switch settings.proximityStationFilter {
@@ -345,94 +366,130 @@ struct NotificationTestResult: Equatable {
                     }
 
                     if matchingStations.isEmpty {
+                        proximityState = .wouldNotFire
                         let inRangeNames = stationsInRange.map(\.name).joined(separator: ", ")
-                        proximityResult = (false, "Stations in range (\(inRangeNames)) are not in your selected filter.")
+                        proximityDetail = "Stations in range (\(inRangeNames)) are not in your selected filter."
                     } else {
                         let names = matchingStations.map(\.name).joined(separator: ", ")
-                        proximityResult = (true, "Near: \(names)")
+                        if let remaining = cooldownRemaining {
+                            proximityState = .cooldownBlocked(remaining: remaining)
+                            proximityDetail = "Near: \(names). Would fire, but cooldown is active."
+                        } else {
+                            proximityState = .wouldFire
+                            proximityDetail = "Near: \(names)"
+                        }
                     }
                 }
             }
-            }
         } else {
-            proximityResult = (false, "Location unavailable.")
+            proximityState = .wouldNotFire
+            proximityDetail = "Location unavailable."
         }
 
-        let movementResult: (Bool, String)
+        let movementState: NotificationTestFireState
+        let movementDetail: String
+
         if !settings.movementEnabled {
-            movementResult = (false, "Movement alerts are disabled.")
+            movementState = .wouldNotFire
+            movementDetail = "Movement alerts are disabled."
         } else {
             let speedKMH = String(format: "%.1f", speed * 3.6)
             let inRange = speed >= settings.minimumSpeedMPS && speed <= settings.maximumSpeedMPS
 
-            let cooldownElapsed: Bool
-            var cooldownNote = ""
-            if settings.movementCooldownSeconds > 0, let lastTime = lastMovementNotificationTime {
-                let elapsed = Date().timeIntervalSince(lastTime)
-                let remaining = settings.movementCooldownSeconds - elapsed
-                if remaining > 0 {
-                    cooldownElapsed = false
-                    let mins = Int(remaining / 60)
-                    let secs = Int(remaining.truncatingRemainder(dividingBy: 60))
-                    cooldownNote = " Cooldown active (\(mins)m \(secs)s remaining)."
-                } else {
-                    cooldownElapsed = true
-                }
-            } else {
-                cooldownElapsed = true
-            }
+            let cooldownRemaining = Self.cooldownRemaining(
+                cooldownSeconds: settings.movementCooldownSeconds,
+                lastNotificationTime: lastMovementNotificationTime
+            )
 
-            if inRange && !cooldownElapsed {
-                movementResult = (false, "Speed \(speedKMH) km/h is within metro range but suppressed by cooldown.\(cooldownNote)")
-            } else if inRange {
-                if let filter = settings.requireStartAtStationFilter {
-                    let allStations = MetroLine.all.flatMap { $0.stations }
-                    let nearbyStations: [MetroStation]
-                    if let loc = location {
-                        nearbyStations = allStations.filter { $0.isNearby(loc) }
+            if !inRange {
+                movementState = .wouldNotFire
+                if speed < settings.minimumSpeedMPS {
+                    movementDetail = "Speed \(speedKMH) km/h is below minimum (\(String(format: "%.0f", settings.minimumSpeedKMH)) km/h)."
+                } else {
+                    movementDetail = "Speed \(speedKMH) km/h is above maximum (\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h)."
+                }
+            } else if let filter = settings.requireStartAtStationFilter {
+                let allStations = MetroLine.all.flatMap { $0.stations }
+                let nearbyStations: [MetroStation]
+                if let loc = location {
+                    nearbyStations = allStations.filter { $0.isNearby(loc) }
+                } else {
+                    nearbyStations = []
+                }
+
+                let stationCheckPassed: Bool
+                let stationDetail: String
+
+                switch filter {
+                case .all:
+                    if nearbyStations.isEmpty {
+                        stationCheckPassed = false
+                        stationDetail = "Speed \(speedKMH) km/h is within metro range but \"Require start at station\" is enabled and you are not near any station."
                     } else {
-                        nearbyStations = []
+                        stationCheckPassed = true
+                        let stationNames = nearbyStations.map(\.name).joined(separator: ", ")
+                        stationDetail = "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h). Near station: \(stationNames)."
                     }
-
-                    switch filter {
-                    case .all:
+                case .selected(let names):
+                    let matching = nearbyStations.filter { names.contains($0.name) }
+                    if matching.isEmpty {
+                        stationCheckPassed = false
                         if nearbyStations.isEmpty {
-                            movementResult = (false, "Speed \(speedKMH) km/h is within metro range but \"Require start at station\" is enabled and you are not near any station.")
+                            stationDetail = "Speed \(speedKMH) km/h is within metro range but \"Require start at station\" is enabled with a station filter, and you are not near any station."
                         } else {
-                            let stationNames = nearbyStations.map(\.name).joined(separator: ", ")
-                            movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h). Near station: \(stationNames).")
+                            let nearbyNames = nearbyStations.map(\.name).joined(separator: ", ")
+                            stationDetail = "Speed \(speedKMH) km/h is within metro range but nearby stations (\(nearbyNames)) are not in the required start-station filter."
                         }
-                    case .selected(let names):
-                        let matching = nearbyStations.filter { names.contains($0.name) }
-                        if matching.isEmpty {
-                            if nearbyStations.isEmpty {
-                                movementResult = (false, "Speed \(speedKMH) km/h is within metro range but \"Require start at station\" is enabled with a station filter, and you are not near any station.")
-                            } else {
-                                let nearbyNames = nearbyStations.map(\.name).joined(separator: ", ")
-                                movementResult = (false, "Speed \(speedKMH) km/h is within metro range but nearby stations (\(nearbyNames)) are not in the required start-station filter.")
-                            }
-                        } else {
-                            let stationNames = matching.map(\.name).joined(separator: ", ")
-                            movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h). Near selected station: \(stationNames).")
-                        }
+                    } else {
+                        stationCheckPassed = true
+                        let stationNames = matching.map(\.name).joined(separator: ", ")
+                        stationDetail = "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h). Near selected station: \(stationNames)."
+                    }
+                }
+
+                if stationCheckPassed {
+                    if let remaining = cooldownRemaining {
+                        movementState = .cooldownBlocked(remaining: remaining)
+                        movementDetail = "\(stationDetail) Would fire, but cooldown is active."
+                    } else {
+                        movementState = .wouldFire
+                        movementDetail = stationDetail
                     }
                 } else {
-                    movementResult = (true, "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h).")
+                    movementState = .wouldNotFire
+                    movementDetail = stationDetail
                 }
-            } else if speed < settings.minimumSpeedMPS {
-                movementResult = (false, "Speed \(speedKMH) km/h is below minimum (\(String(format: "%.0f", settings.minimumSpeedKMH)) km/h).")
             } else {
-                movementResult = (false, "Speed \(speedKMH) km/h is above maximum (\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h).")
+                let detail = "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h)."
+                if let remaining = cooldownRemaining {
+                    movementState = .cooldownBlocked(remaining: remaining)
+                    movementDetail = "\(detail) Would fire, but cooldown is active."
+                } else {
+                    movementState = .wouldFire
+                    movementDetail = detail
+                }
             }
         }
 
         return NotificationTestResult(
             timestamp: Date(),
-            proximityWouldFire: proximityResult.0,
-            proximityDetail: proximityResult.1,
-            movementWouldFire: movementResult.0,
-            movementDetail: movementResult.1
+            proximityState: proximityState,
+            proximityDetail: proximityDetail,
+            movementState: movementState,
+            movementDetail: movementDetail
         )
+    }
+
+    private static func cooldownRemaining(
+        cooldownSeconds: TimeInterval,
+        lastNotificationTime: Date?
+    ) -> TimeInterval? {
+        guard cooldownSeconds > 0, let lastTime = lastNotificationTime else {
+            return nil
+        }
+        let elapsed = Date().timeIntervalSince(lastTime)
+        let remaining = cooldownSeconds - elapsed
+        return remaining > 0 ? remaining : nil
     }
 }
 
