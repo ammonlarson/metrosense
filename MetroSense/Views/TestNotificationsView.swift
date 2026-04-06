@@ -6,6 +6,7 @@ struct TestNotificationsView: View {
     let location: CLLocation?
     let speed: Double?
     let lastMovementNotificationTime: Date?
+    let lastProximityNotificationTime: Date?
 
     @State private var testResult: NotificationTestResult?
     @State private var isTesting: Bool = false
@@ -26,7 +27,7 @@ struct TestNotificationsView: View {
                         Text("min")
                             .foregroundStyle(.secondary)
                     }
-                    Text("Minimum time between repeated movement alerts.")
+                    Text("Minimum time between repeated alerts (applies to both proximity and movement).")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -128,7 +129,8 @@ struct TestNotificationsView: View {
                 settings: settings,
                 location: location,
                 speed: speed ?? 0,
-                lastMovementNotificationTime: lastMovementNotificationTime
+                lastMovementNotificationTime: lastMovementNotificationTime,
+                lastProximityNotificationTime: lastProximityNotificationTime
             )
             withAnimation {
                 testResult = result
