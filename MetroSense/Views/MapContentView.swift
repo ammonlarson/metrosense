@@ -276,35 +276,6 @@ struct MapContentView: View {
                     .ignoresSafeArea(edges: .bottom)
             }
             .offset(y: clampedDrag)
-            .gesture(
-                DragGesture()
-                    .onChanged { value in
-                        dragOffset = value.translation.height
-                    }
-                    .onEnded { value in
-                        let projected = value.predictedEndTranslation.height
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                            if settingsVisible {
-                                if projected > Self.snapThreshold {
-                                    settingsVisible = false
-                                }
-                            } else if overlayExpanded {
-                                if projected > Self.snapThreshold {
-                                    overlayExpanded = false
-                                } else if projected < -Self.snapThreshold {
-                                    settingsVisible = true
-                                }
-                            } else {
-                                if projected < -Self.snapThreshold {
-                                    overlayExpanded = true
-                                }
-                            }
-                            dragOffset = 0
-                        } completion: {
-                            showSettingsIcon = !settingsVisible
-                        }
-                    }
-            )
         }
         .frame(height: totalOverlayHeight)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: settingsVisible)
@@ -458,6 +429,35 @@ struct MapContentView: View {
             }
             .padding(.trailing, 8)
         }
+        .gesture(
+            DragGesture()
+                .onChanged { value in
+                    dragOffset = value.translation.height
+                }
+                .onEnded { value in
+                    let projected = value.predictedEndTranslation.height
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        if settingsVisible {
+                            if projected > Self.snapThreshold {
+                                settingsVisible = false
+                            }
+                        } else if overlayExpanded {
+                            if projected > Self.snapThreshold {
+                                overlayExpanded = false
+                            } else if projected < -Self.snapThreshold {
+                                settingsVisible = true
+                            }
+                        } else {
+                            if projected < -Self.snapThreshold {
+                                overlayExpanded = true
+                            }
+                        }
+                        dragOffset = 0
+                    } completion: {
+                        showSettingsIcon = !settingsVisible
+                    }
+                }
+        )
     }
 
     private var dragHandle: some View {
