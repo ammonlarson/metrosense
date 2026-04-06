@@ -44,7 +44,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 categoriesSection
-                testSection
+                notificationsSection
             }
             .navigationTitle("Notification Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -124,7 +124,7 @@ struct SettingsView: View {
 
     // MARK: - Notifications Section
 
-    private var testSection: some View {
+    private var notificationsSection: some View {
         Section {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
