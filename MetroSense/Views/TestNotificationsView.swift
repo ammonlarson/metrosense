@@ -79,10 +79,10 @@ struct TestNotificationsView: View {
             if let result = testResult {
                 Section("Results") {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Image(systemName: result.proximityWouldFire ? "checkmark.circle.fill" : "xmark.circle.fill")
-                            .foregroundStyle(result.proximityWouldFire ? .green : .red)
+                        Image(systemName: result.proximityState.icon)
+                            .foregroundStyle(result.proximityState.color)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(result.proximityWouldFire ? "Proximity: Would fire" : "Proximity: Would not fire")
+                            Text(result.proximityState.label(for: "Proximity"))
                                 .font(.body)
                             Text(result.proximityDetail)
                                 .font(.caption)
@@ -91,10 +91,10 @@ struct TestNotificationsView: View {
                     }
 
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Image(systemName: result.movementWouldFire ? "checkmark.circle.fill" : "xmark.circle.fill")
-                            .foregroundStyle(result.movementWouldFire ? .green : .red)
+                        Image(systemName: result.movementState.icon)
+                            .foregroundStyle(result.movementState.color)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(result.movementWouldFire ? "Movement: Would fire" : "Movement: Would not fire")
+                            Text(result.movementState.label(for: "Movement"))
                                 .font(.body)
                             Text(result.movementDetail)
                                 .font(.caption)
