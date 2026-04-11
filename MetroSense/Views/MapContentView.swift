@@ -357,14 +357,16 @@ struct MapContentView: View {
         }
     }
 
-    private var showRejsekortShortcut: Bool {
-        switch viewModel.tripState {
-        case .atStation, .onMetro:
-            return true
-        case .idle, .arrived:
-            return false
-        }
-    }
+    // TODO: Restore state filtering after testing
+    // private var showRejsekortShortcut: Bool {
+    //     switch viewModel.tripState {
+    //     case .atStation, .onMetro:
+    //         return true
+    //     case .idle, .arrived:
+    //         return false
+    //     }
+    // }
+    private var showRejsekortShortcut: Bool { true }
 
     private static let rejsekortAppURL = URL(string: "https://app.rejsekort.dk")!
     private static let rejsekortStoreURL = URL(string: "https://apps.apple.com/app/id6469603787")!
