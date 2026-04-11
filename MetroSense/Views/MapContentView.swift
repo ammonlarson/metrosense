@@ -31,10 +31,9 @@ struct MapContentView: View {
 
     /// Minimum height always kept visible for the map above the overlay.
     private static let minimumMapHeight: CGFloat = 120
-    /// Threshold to trigger a snap when dragging down.
-    private static let collapseThreshold: CGFloat = 40
-    /// Threshold to trigger a snap when swiping up (lowered for easier gesture).
-    private static let expandThreshold: CGFloat = 50
+    /// Threshold on predictedEndTranslation to snap between modes.
+    private static let collapseThreshold: CGFloat = 20
+    private static let expandThreshold: CGFloat = 20
     /// Base collapsed height used as starting point before screen-relative capping.
     private static let baseCollapsedHeight: CGFloat = 130
     private static let baseLandscapeCollapsedHeight: CGFloat = 100
