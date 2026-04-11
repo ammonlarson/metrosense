@@ -8,7 +8,7 @@ final class NotificationService: NSObject, ObservableObject {
 
     static let proximityCategory = "PROXIMITY_NOTIFICATION"
     static let movementCategory = "MOVEMENT_NOTIFICATION"
-    static let rejsekortActionIdentifier = "OPEN_REJSEKORT_ACTION"
+    nonisolated static let rejsekortActionIdentifier = "OPEN_REJSEKORT_ACTION"
 
     static let rejsekortAppURL = URL(string: "https://app.rejsekort.dk")!
     static let rejsekortStoreURL = URL(string: "https://apps.apple.com/app/id6469603787")!

@@ -10,6 +10,7 @@
 		0C7DFAD6DA55C5CFA8BB04ED /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3DAA8333A89FEB3A9954DD6 /* ContentView.swift */; };
 		2D100B05B71F7D0BF9EDB78E /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DC1367451D3060AD2ADEAC /* NotificationService.swift */; };
 		2D50D1BC925E68EF3AAB4C0E /* MovementSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06C154754907F423A6F5ECB3 /* MovementSettingsView.swift */; };
+		390E68605F1E9883DEA6C15E /* RejsekortSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF8CFF12F5A43CCBFAB4750 /* RejsekortSettingsView.swift */; };
 		40D7299D802D58CD81088BB6 /* MetroTripState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B98CFDE82A93ADF8A57FCB /* MetroTripState.swift */; };
 		4FE4B7D5A619E9A3C255D02E /* MapContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0C416A9690EA5DEBE5C4784 /* MapContentView.swift */; };
 		60466D3225B82933E5C98507 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DAE224E25AB5C6325640083 /* Assets.xcassets */; };
@@ -42,6 +43,7 @@
 		78E97B6B2B8614B249637CDD /* TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapView.swift; sourceTree = "<group>"; };
 		9C2421502AA5169B997BE291 /* MetroSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetroSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A46816E662033897D01B62A6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AEF8CFF12F5A43CCBFAB4750 /* RejsekortSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RejsekortSettingsView.swift; sourceTree = "<group>"; };
 		B764777F71F980FF1A1C6979 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationFilterPickerView.swift; sourceTree = "<group>"; };
 		E0C416A9690EA5DEBE5C4784 /* MapContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapContentView.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 				E0C416A9690EA5DEBE5C4784 /* MapContentView.swift */,
 				06C154754907F423A6F5ECB3 /* MovementSettingsView.swift */,
 				033B28468695ABC40411E0EF /* ProximitySettingsView.swift */,
+				AEF8CFF12F5A43CCBFAB4750 /* RejsekortSettingsView.swift */,
 				A46816E662033897D01B62A6 /* SettingsView.swift */,
 				B764777F71F980FF1A1C6979 /* SplashScreen.swift */,
 				BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */,
@@ -210,6 +213,7 @@
 				2D100B05B71F7D0BF9EDB78E /* NotificationService.swift in Sources */,
 				C628CB165B841562784910FB /* NotificationSettings.swift in Sources */,
 				BDEA8D9D10B51FD3CB63E79E /* ProximitySettingsView.swift in Sources */,
+				390E68605F1E9883DEA6C15E /* RejsekortSettingsView.swift in Sources */,
 				6FD5402AA4B21C8588F762FF /* SettingsView.swift in Sources */,
 				A3270A9E3DBDF7B9D145F2FA /* SplashScreen.swift in Sources */,
 				D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */,
