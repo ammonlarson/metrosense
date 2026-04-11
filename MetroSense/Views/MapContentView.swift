@@ -104,9 +104,9 @@ struct MapContentView: View {
         return totalOverlayHeight - clampedDrag
     }
 
-    /// Height of the settings overlay header (drag handle + title row).
+    /// Height of the settings overlay header (close button + top padding).
     private var settingsHeaderAreaHeight: CGFloat {
-        17 + 4
+        44 + 12
     }
 
     /// Settings overlay height sized to fit content, capped at 3/4 screen.

@@ -59,8 +59,8 @@ struct NotificationSettings: Equatable, Codable {
         alwaysShowRejsekortPill: false,
         proximityShowRejsekortPill: true,
         movementShowRejsekortPill: true,
-        proximityRejsekortAction: true,
-        movementRejsekortAction: true
+        proximityRejsekortAction: false,
+        movementRejsekortAction: false
     )
 
     // MARK: - km/h Convenience
@@ -187,8 +187,8 @@ extension NotificationSettings {
         alwaysShowRejsekortPill = try container.decodeIfPresent(Bool.self, forKey: .alwaysShowRejsekortPill) ?? false
         proximityShowRejsekortPill = try container.decodeIfPresent(Bool.self, forKey: .proximityShowRejsekortPill) ?? true
         movementShowRejsekortPill = try container.decodeIfPresent(Bool.self, forKey: .movementShowRejsekortPill) ?? true
-        proximityRejsekortAction = try container.decodeIfPresent(Bool.self, forKey: .proximityRejsekortAction) ?? true
-        movementRejsekortAction = try container.decodeIfPresent(Bool.self, forKey: .movementRejsekortAction) ?? true
+        proximityRejsekortAction = try container.decodeIfPresent(Bool.self, forKey: .proximityRejsekortAction) ?? false
+        movementRejsekortAction = try container.decodeIfPresent(Bool.self, forKey: .movementRejsekortAction) ?? false
     }
 
     func encode(to encoder: Encoder) throws {
