@@ -16,7 +16,8 @@ struct MapContentView: View {
 
     @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
     @State private var settingsVisible: Bool = false
-    @State private var dragOffset: CGFloat = 0
+    @GestureState(resetTransaction: Transaction(animation: .spring(response: 0.35, dampingFraction: 0.8)))
+    private var dragOffset: CGFloat = 0
     @State private var screenHeight: CGFloat = 0
     @State private var screenWidth: CGFloat = 0
     @State private var bottomSafeAreaInset: CGFloat = 0
@@ -575,6 +576,10 @@ struct MapContentView: View {
 
     private var overlayDragGesture: some Gesture {
         DragGesture()
+            .updating($dragOffset) { value, state, transaction in
+                transaction.animation = nil
+                state = value.translation.height
+            }
             .onEnded { value in
                 let projected = value.predictedEndTranslation.height
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
