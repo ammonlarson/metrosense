@@ -366,11 +366,16 @@ struct MapContentView: View {
         }
     }
 
-    private static let rejsekortURL = URL(string: "https://apps.apple.com/app/id6469603787")!
+    private static let rejsekortAppURL = URL(string: "https://app.rejsekort.dk")!
+    private static let rejsekortStoreURL = URL(string: "https://apps.apple.com/app/id6469603787")!
 
     private var rejsekortButton: some View {
         Button {
-            openURL(Self.rejsekortURL)
+            openURL(Self.rejsekortAppURL) { accepted in
+                if !accepted {
+                    openURL(Self.rejsekortStoreURL)
+                }
+            }
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "creditcard.fill")
