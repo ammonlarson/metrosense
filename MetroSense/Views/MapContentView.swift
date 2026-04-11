@@ -30,7 +30,8 @@ struct MapContentView: View {
     /// Minimum height always kept visible for the map above the overlay.
     private static let minimumMapHeight: CGFloat = 120
     /// Threshold to trigger a snap when dragging.
-    private static let snapThreshold: CGFloat = 80
+    private static let collapseThreshold: CGFloat = 40
+    private static let expandThreshold: CGFloat = 120
     /// Base heights used as starting points before screen-relative capping.
     private static let baseCollapsedHeight: CGFloat = 130
     private static let baseFullHeight: CGFloat = 370
@@ -255,6 +256,16 @@ struct MapContentView: View {
             VStack(spacing: 0) {
                 overlayHeader
 
+                Image(metroStatusImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: isLandscape ? min(statusImageHeight * 0.6, 80) : min(statusImageHeight, 140))
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .padding(.top, 8)
+                    .padding(.bottom, isLandscape ? 6 : 12)
+                    .gesture(overlayDragGesture)
+
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 0) {
                         if isLandscape && settingsVisible {
@@ -336,13 +347,6 @@ struct MapContentView: View {
 
     private var statusSection: some View {
         VStack(spacing: 0) {
-            Image(metroStatusImage)
-                .resizable()
-                .scaledToFit()
-                .frame(height: isLandscape ? min(statusImageHeight * 0.6, 80) : min(statusImageHeight, 140))
-                .padding(.top, 8)
-                .padding(.bottom, isLandscape ? 6 : 12)
-
             Text(tripStateLabel)
                 .font(isLandscape ? .headline.bold() : .title2.bold())
                 .foregroundStyle(.primary)
@@ -476,35 +480,37 @@ struct MapContentView: View {
             }
             .padding(.trailing, 8)
         }
-        .gesture(
-            DragGesture()
-                .onChanged { value in
-                    dragOffset = value.translation.height
-                }
-                .onEnded { value in
-                    let projected = value.predictedEndTranslation.height
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                        if settingsVisible {
-                            if projected > Self.snapThreshold {
-                                settingsVisible = false
-                            }
-                        } else if overlayExpanded {
-                            if projected > Self.snapThreshold {
-                                overlayExpanded = false
-                            } else if projected < -Self.snapThreshold {
-                                settingsVisible = true
-                            }
-                        } else {
-                            if projected < -Self.snapThreshold {
-                                overlayExpanded = true
-                            }
+        .gesture(overlayDragGesture)
+    }
+
+    private var overlayDragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                dragOffset = value.translation.height
+            }
+            .onEnded { value in
+                let projected = value.predictedEndTranslation.height
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                    if settingsVisible {
+                        if projected > Self.collapseThreshold {
+                            settingsVisible = false
                         }
-                        dragOffset = 0
-                    } completion: {
-                        showSettingsIcon = !settingsVisible
+                    } else if overlayExpanded {
+                        if projected > Self.collapseThreshold {
+                            overlayExpanded = false
+                        } else if projected < -Self.expandThreshold {
+                            settingsVisible = true
+                        }
+                    } else {
+                        if projected < -Self.expandThreshold {
+                            overlayExpanded = true
+                        }
                     }
+                    dragOffset = 0
+                } completion: {
+                    showSettingsIcon = !settingsVisible
                 }
-        )
+            }
     }
 
     private var dragHandle: some View {
