@@ -334,9 +334,9 @@ struct MapContentView: View {
 
     private var metroStatusImage: String {
         switch viewModel.tripState {
-        case .idle, .atStation:
+        case .idle:
             return "MetroNo"
-        case .onMetro, .arrived:
+        case .atStation, .onMetro, .arrived:
             return "MetroYes"
         }
     }
