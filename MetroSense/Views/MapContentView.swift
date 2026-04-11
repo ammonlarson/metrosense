@@ -20,24 +20,25 @@ struct MapContentView: View {
     @State private var screenHeight: CGFloat = 0
     @State private var screenWidth: CGFloat = 0
     @State private var bottomSafeAreaInset: CGFloat = 0
+    @State private var measuredScrollContentHeight: CGFloat = 200
+    @State private var measuredSettingsContentHeight: CGFloat = 200
 
     @State private var showingProximitySettings: Bool = false
     @State private var showingMovementSettings: Bool = false
     @State private var showingTestNotifications: Bool = false
     @State private var showingRejsekortSettings: Bool = false
-    @State private var showSettingsIcon: Bool = true
 
     private let allStationNames: [String]
 
     /// Minimum height always kept visible for the map above the overlay.
     private static let minimumMapHeight: CGFloat = 120
-    /// Threshold to trigger a snap when dragging.
-    private static let collapseThreshold: CGFloat = 40
-    private static let expandThreshold: CGFloat = 120
-    /// Base heights used as starting points before screen-relative capping.
+    /// Threshold on predictedEndTranslation to snap between modes.
+    private static let collapseThreshold: CGFloat = 20
+    private static let expandThreshold: CGFloat = 20
+    /// Base collapsed height used as starting point before screen-relative capping.
     private static let baseCollapsedHeight: CGFloat = 130
-    private static let baseFullHeight: CGFloat = 370
-    private static let baseSettingsHeight: CGFloat = 600
+    private static let baseLandscapeCollapsedHeight: CGFloat = 100
+    private static let rejsekortButtonHeight: CGFloat = 44
 
     init(viewModel: MetroViewModel, onSettingsChanged: @escaping (NotificationSettings) -> Void) {
         self.viewModel = viewModel
@@ -58,14 +59,11 @@ struct MapContentView: View {
         verticalSizeClass == .compact
     }
 
-    /// Base heights for landscape mode.
-    private static let baseLandscapeCollapsedHeight: CGFloat = 100
-    private static let baseLandscapeFullHeight: CGFloat = 220
-
-    /// Maximum overlay height that still leaves enough map visible.
+    /// Maximum overlay height, capped at three-quarters of the screen so the
+    /// map always remains visible. The minimumMapHeight acts as a safety floor.
     private var maxOverlayHeight: CGFloat {
         guard screenHeight > 0 else { return 600 }
-        return screenHeight - Self.minimumMapHeight
+        return min(screenHeight * 0.75, screenHeight - Self.minimumMapHeight)
     }
 
     private var currentCollapsedHeight: CGFloat {
@@ -73,26 +71,56 @@ struct MapContentView: View {
         return min(base, maxOverlayHeight)
     }
 
-    private static let rejsekortButtonHeight: CGFloat = 44
+    /// Bottom padding so the lowest content stays above the iPhone's rounded
+    /// lower corners.
+    private var bottomContentInset: CGFloat {
+        bottomSafeAreaInset > 0 ? bottomSafeAreaInset + 8 : 8
+    }
 
+    /// Height of the non-scrollable header area (drag handle + status image).
+    private var overlayHeaderAreaHeight: CGFloat {
+        let handleH: CGFloat = 17
+        let imageH = isLandscape ? min(statusImageHeight * 0.6, 80) : min(statusImageHeight, 140)
+        let imagePadding: CGFloat = 8 + (isLandscape ? 6 : 12)
+        return handleH + imageH + imagePadding
+    }
+
+    /// Standard mode height sized to fit content, capped at 3/4 screen.
     private var currentFullHeight: CGFloat {
-        var base = isLandscape ? Self.baseLandscapeFullHeight : Self.baseFullHeight
-        if showRejsekortShortcut {
-            base += Self.rejsekortButtonHeight
-        }
-        return min(base, maxOverlayHeight)
+        let ideal = overlayHeaderAreaHeight + measuredScrollContentHeight + bottomContentInset
+        return min(ideal, maxOverlayHeight)
     }
 
-    /// In landscape, settings replace the main content instead of appending
-    /// below it, so we reuse the full overlay height rather than growing taller.
-    private var currentSettingsHeight: CGFloat {
-        let base = isLandscape ? Self.baseLandscapeFullHeight : Self.baseSettingsHeight
-        return min(base, maxOverlayHeight)
-    }
-
-    /// Total overlay height (background extends into safe area via ignoresSafeArea).
+    /// Total overlay height for the main content card.
     private var totalOverlayHeight: CGFloat {
-        settingsVisible ? currentSettingsHeight : currentFullHeight
+        currentFullHeight
+    }
+
+    /// Height of the settings overlay header (drag handle + title row).
+    private var settingsHeaderAreaHeight: CGFloat {
+        17 + 4
+    }
+
+    /// Settings overlay height sized to fit content, capped at 3/4 screen.
+    private var settingsOverlayHeight: CGFloat {
+        let ideal = settingsHeaderAreaHeight + measuredSettingsContentHeight + bottomContentInset
+        return min(ideal, maxOverlayHeight)
+    }
+
+    // MARK: - Preference Keys
+
+    private struct ScrollContentHeightKey: PreferenceKey {
+        static var defaultValue: CGFloat = 0
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = max(value, nextValue())
+        }
+    }
+
+    private struct SettingsContentHeightKey: PreferenceKey {
+        static var defaultValue: CGFloat = 0
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = max(value, nextValue())
+        }
     }
 
     var body: some View {
@@ -110,9 +138,16 @@ struct MapContentView: View {
                         resetCameraButton
                     }
                     .padding(.horizontal, 16)
-                    overlayCard
+
+                    if settingsVisible {
+                        settingsOverlay
+                            .transition(.move(edge: .bottom))
+                    } else {
+                        overlayCard
+                    }
                 }
                 .ignoresSafeArea(edges: .bottom)
+                .animation(.spring(response: 0.35, dampingFraction: 0.8), value: settingsVisible)
             }
             .onAppear {
                 screenHeight = geometry.size.height
@@ -260,7 +295,7 @@ struct MapContentView: View {
         .ignoresSafeArea()
     }
 
-    // MARK: - Overlay Card
+    // MARK: - Content Overlay Card
 
     private var metroStatusImage: String {
         switch viewModel.tripState {
@@ -293,22 +328,21 @@ struct MapContentView: View {
 
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 0) {
-                        if isLandscape && settingsVisible {
-                            settingsCategories
-                                .transition(.opacity)
-                        } else if isLandscape {
+                        if isLandscape {
                             landscapeContent
                         } else {
                             portraitContent
-
-                            if settingsVisible {
-                                settingsCategories
-                                    .transition(.opacity.combined(with: .move(edge: .bottom)))
-                            }
                         }
                     }
+                    .background(GeometryReader { geo in
+                        Color.clear.preference(key: ScrollContentHeightKey.self, value: geo.size.height)
+                    })
+                    .padding(.bottom, bottomContentInset)
                 }
                 .scrollBounceBehavior(.basedOnSize)
+                .onPreferenceChange(ScrollContentHeightKey.self) { height in
+                    measuredScrollContentHeight = height
+                }
 
                 Spacer(minLength: 0)
             }
@@ -321,8 +355,59 @@ struct MapContentView: View {
             .offset(y: clampedDrag)
         }
         .frame(height: totalOverlayHeight)
-        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: settingsVisible)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showRejsekortShortcut)
+    }
+
+    // MARK: - Settings Overlay
+
+    private var settingsOverlay: some View {
+        VStack(spacing: 0) {
+            settingsOverlayHeader
+
+            ScrollView(.vertical, showsIndicators: false) {
+                settingsCategoryRows
+                    .background(GeometryReader { geo in
+                        Color.clear.preference(key: SettingsContentHeightKey.self, value: geo.size.height)
+                    })
+                    .padding(.bottom, bottomContentInset)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .onPreferenceChange(SettingsContentHeightKey.self) { height in
+                measuredSettingsContentHeight = height
+            }
+        }
+        .frame(height: settingsOverlayHeight)
+        .frame(maxWidth: .infinity)
+        .background {
+            (colorScheme == .dark ? Color.black : Color.white)
+                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
+                .ignoresSafeArea(edges: .bottom)
+        }
+    }
+
+    private var settingsOverlayHeader: some View {
+        ZStack {
+            dragHandle
+            HStack {
+                Text("Settings")
+                    .font(.headline.bold())
+                    .padding(.leading, 16)
+                Spacer()
+                Button {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        settingsVisible = false
+                    }
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel("Close settings")
+            }
+            .padding(.trailing, 8)
+            .padding(.top, 4)
+        }
     }
 
     // MARK: - Portrait Content
@@ -464,45 +549,24 @@ struct MapContentView: View {
         .padding(.vertical, sectionVerticalPadding)
     }
 
+    // MARK: - Overlay Header & Gestures
+
     private var overlayHeader: some View {
         ZStack {
             dragHandle
             HStack {
                 Spacer()
-                if showSettingsIcon {
-                    Button {
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                            if !overlayExpanded {
-                                overlayExpanded = true
-                            }
-                            settingsVisible = true
-                        } completion: {
-                            showSettingsIcon = false
-                        }
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title2)
-                            .foregroundStyle(.secondary)
-                            .frame(width: 44, height: 44)
+                Button {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        settingsVisible = true
                     }
-                    .accessibilityLabel("Settings")
-                    .transition(.identity)
-                } else {
-                    Button {
-                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                            settingsVisible = false
-                        } completion: {
-                            showSettingsIcon = true
-                        }
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title)
-                            .foregroundStyle(.secondary)
-                            .frame(width: 44, height: 44)
-                    }
-                    .accessibilityLabel("Close settings")
-                    .transition(.identity)
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.title2)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 44, height: 44)
                 }
+                .accessibilityLabel("Settings")
             }
             .padding(.trailing, 8)
         }
@@ -517,15 +581,9 @@ struct MapContentView: View {
             .onEnded { value in
                 let projected = value.predictedEndTranslation.height
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                    if settingsVisible {
-                        if projected > Self.collapseThreshold {
-                            settingsVisible = false
-                        }
-                    } else if overlayExpanded {
+                    if overlayExpanded {
                         if projected > Self.collapseThreshold {
                             overlayExpanded = false
-                        } else if projected < -Self.expandThreshold {
-                            settingsVisible = true
                         }
                     } else {
                         if projected < -Self.expandThreshold {
@@ -533,8 +591,6 @@ struct MapContentView: View {
                         }
                     }
                     dragOffset = 0
-                } completion: {
-                    showSettingsIcon = !settingsVisible
                 }
             }
     }
@@ -557,23 +613,6 @@ struct MapContentView: View {
 
     private var movementStatusText: String {
         viewModel.settings.movementEnabled ? "On — \(Int(viewModel.settings.minimumSpeedKMH))–\(Int(viewModel.settings.maximumSpeedKMH)) km/h" : "Off"
-    }
-
-    private var settingsCategories: some View {
-        VStack(spacing: 0) {
-            Divider()
-                .padding(.horizontal)
-
-            Text("Settings")
-                .font(.footnote.bold())
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.top, isLandscape ? 6 : 12)
-                .padding(.bottom, isLandscape ? 2 : 4)
-
-            settingsCategoryRows
-        }
     }
 
     private var settingsCategoryRows: some View {
@@ -717,6 +756,7 @@ struct MapContentView: View {
     /// The vertical offset applied to the overlay card content, mirrored here
     /// so the reset button tracks the overlay during drag and snap animations.
     private var overlayOffset: CGFloat {
+        if settingsVisible { return 0 }
         let collapseOffset = max(totalOverlayHeight - currentCollapsedHeight, 0)
         let baseOffset = overlayExpanded ? 0 : collapseOffset
         return min(max(dragOffset + baseOffset, 0), collapseOffset)
@@ -747,7 +787,7 @@ struct MapContentView: View {
         guard screenHeight > 0 else { return 0 }
         let visibleOverlayHeight: CGFloat
         if settingsVisible {
-            visibleOverlayHeight = currentSettingsHeight + bottomSafeAreaInset
+            visibleOverlayHeight = settingsOverlayHeight + bottomSafeAreaInset
         } else if overlayExpanded {
             visibleOverlayHeight = currentFullHeight + bottomSafeAreaInset
         } else {
