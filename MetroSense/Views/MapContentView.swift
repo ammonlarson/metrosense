@@ -83,7 +83,7 @@ struct MapContentView: View {
     private var overlayHeaderAreaHeight: CGFloat {
         let handleH: CGFloat = 17
         let imageH = isLandscape ? min(statusImageHeight * 0.6, 80) : min(statusImageHeight, 140)
-        let imagePadding: CGFloat = 8 + (isLandscape ? 6 : 12)
+        let imagePadding: CGFloat = 8 + (isLandscape ? 2 : 6)
         return handleH + imageH + imagePadding
     }
 
@@ -352,7 +352,7 @@ struct MapContentView: View {
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
                 .padding(.top, 8)
-                .padding(.bottom, isLandscape ? 6 : 12)
+                .padding(.bottom, isLandscape ? 2 : 6)
                 .gesture(overlayDragGesture)
 
             ScrollView(.vertical, showsIndicators: false) {
