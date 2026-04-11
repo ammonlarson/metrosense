@@ -15,8 +15,6 @@ struct TestNotificationsView: View {
 
     var body: some View {
         Form {
-            rejsekortSection
-
             Section {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
@@ -36,6 +34,8 @@ struct TestNotificationsView: View {
             } header: {
                 Text("Settings")
             }
+
+            rejsekortSection
 
             Section {
                 Button {
@@ -148,9 +148,13 @@ struct TestNotificationsView: View {
                     .tint(.blue)
             }
         } header: {
-            Text("Rejsekort")
-        } footer: {
-            Text("Choose what happens when you tap a notification and whether the Rejsekort shortcut button appears on the main screen.")
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Rejsekort")
+                Text("Choose what happens when you tap a notification and whether the Rejsekort shortcut button appears on the main screen.")
+                    .textCase(nil)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 
