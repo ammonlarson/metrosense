@@ -30,7 +30,8 @@ struct MapContentView: View {
     /// Minimum height always kept visible for the map above the overlay.
     private static let minimumMapHeight: CGFloat = 120
     /// Threshold to trigger a snap when dragging.
-    private static let snapThreshold: CGFloat = 80
+    private static let collapseThreshold: CGFloat = 40
+    private static let expandThreshold: CGFloat = 120
     /// Base heights used as starting points before screen-relative capping.
     private static let baseCollapsedHeight: CGFloat = 130
     private static let baseFullHeight: CGFloat = 370
@@ -491,17 +492,17 @@ struct MapContentView: View {
                 let projected = value.predictedEndTranslation.height
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                     if settingsVisible {
-                        if projected > Self.snapThreshold {
+                        if projected > Self.collapseThreshold {
                             settingsVisible = false
                         }
                     } else if overlayExpanded {
-                        if projected > Self.snapThreshold {
+                        if projected > Self.collapseThreshold {
                             overlayExpanded = false
-                        } else if projected < -Self.snapThreshold {
+                        } else if projected < -Self.expandThreshold {
                             settingsVisible = true
                         }
                     } else {
-                        if projected < -Self.snapThreshold {
+                        if projected < -Self.expandThreshold {
                             overlayExpanded = true
                         }
                     }
