@@ -327,11 +327,14 @@ struct MapContentView: View {
                     .onChange(of: settingsVisible) {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                             if settingsVisible {
-                                scrollProxy.scrollTo("settings", anchor: .bottom)
+                                scrollProxy.scrollTo("settings", anchor: .top)
                             } else {
                                 scrollProxy.scrollTo("top", anchor: .top)
                             }
                         }
+                    }
+                    .onChange(of: verticalSizeClass) {
+                        scrollProxy.scrollTo("top", anchor: .top)
                     }
                 }
 
