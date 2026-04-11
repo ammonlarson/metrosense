@@ -6,6 +6,7 @@ struct TransitMapView: UIViewRepresentable {
     var nearestStation: MetroStation?
     var showsUserLocation: Bool = true
     var cameraResetToken: Int = 0
+    var onUserInteraction: (() -> Void)?
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
@@ -37,6 +38,7 @@ struct TransitMapView: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.showsUserLocation = showsUserLocation
+        context.coordinator.onUserInteraction = onUserInteraction
 
         let forceReset = cameraResetToken != context.coordinator.lastResetToken
         if forceReset {
@@ -44,6 +46,7 @@ struct TransitMapView: UIViewRepresentable {
         }
 
         if let region = region, forceReset || !mapView.region.isApproximatelyEqual(to: region) {
+            context.coordinator.isProgrammaticChange = true
             let animated = context.coordinator.hasSetInitialRegion
             mapView.setRegion(region, animated: animated)
             context.coordinator.hasSetInitialRegion = true
@@ -77,7 +80,25 @@ struct TransitMapView: UIViewRepresentable {
     final class Coordinator: NSObject, MKMapViewDelegate {
         var hasSetInitialRegion = false
         var lastResetToken: Int = 0
+        var isProgrammaticChange = false
+        var onUserInteraction: (() -> Void)?
         private static let pulseViewTag = 1001
+
+        func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+            if isProgrammaticChange {
+                return
+            }
+            let isUserGesture = mapView.subviews.first?.gestureRecognizers?.contains {
+                $0.state == .began || $0.state == .ended || $0.state == .changed
+            } ?? false
+            if isUserGesture {
+                onUserInteraction?()
+            }
+        }
+
+        func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+            isProgrammaticChange = false
+        }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
             guard let stationAnnotation = annotation as? StationAnnotation else {

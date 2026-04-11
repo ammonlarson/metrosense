@@ -12,6 +12,7 @@ struct MapContentView: View {
     @State private var mapRegion: MKCoordinateRegion?
     @State private var lastCameraUpdateLocation: CLLocation?
     @State private var cameraResetToken: Int = 0
+    @State private var isAutoFollowEnabled: Bool = true
 
     @AppStorage("mapOverlayExpanded") private var overlayExpanded: Bool = true
     @State private var settingsVisible: Bool = false
@@ -127,22 +128,22 @@ struct MapContentView: View {
             }
         }
         .onChange(of: viewModel.nearestStation) {
-            updateCamera()
+            if isAutoFollowEnabled { updateCamera() }
         }
         .onChange(of: viewModel.currentLocation?.coordinate.latitude) {
-            updateCameraIfNeeded()
+            if isAutoFollowEnabled { updateCameraIfNeeded() }
         }
         .onChange(of: viewModel.currentLocation?.coordinate.longitude) {
-            updateCameraIfNeeded()
+            if isAutoFollowEnabled { updateCameraIfNeeded() }
         }
         .onChange(of: overlayExpanded) {
-            updateCamera()
+            if isAutoFollowEnabled { updateCamera() }
         }
         .onChange(of: settingsVisible) {
-            updateCamera()
+            if isAutoFollowEnabled { updateCamera() }
         }
         .onChange(of: verticalSizeClass) {
-            updateCamera()
+            if isAutoFollowEnabled { updateCamera() }
         }
         .sheet(isPresented: $showingProximitySettings) {
             NavigationStack {
@@ -230,7 +231,8 @@ struct MapContentView: View {
         TransitMapView(
             region: $mapRegion,
             nearestStation: viewModel.nearestStation,
-            cameraResetToken: cameraResetToken
+            cameraResetToken: cameraResetToken,
+            onUserInteraction: { isAutoFollowEnabled = false }
         )
         .ignoresSafeArea()
     }
@@ -682,16 +684,20 @@ struct MapContentView: View {
 
     private var resetCameraButton: some View {
         Button {
+            isAutoFollowEnabled = true
             lastCameraUpdateLocation = nil
             cameraResetToken += 1
             updateCamera()
         } label: {
-            Image(systemName: "location.fill")
+            Image(systemName: isAutoFollowEnabled ? "location.fill" : "location")
                 .font(.body)
+                .foregroundStyle(isAutoFollowEnabled ? .blue : .secondary)
                 .padding(10)
                 .background(.ultraThinMaterial, in: Circle())
         }
         .offset(y: overlayOffset)
+        .accessibilityLabel(isAutoFollowEnabled ? "Following location" : "Recenter map")
+        .animation(.easeInOut(duration: 0.2), value: isAutoFollowEnabled)
     }
 
     // MARK: - Camera
