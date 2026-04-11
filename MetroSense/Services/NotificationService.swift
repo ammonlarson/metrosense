@@ -9,7 +9,6 @@ final class NotificationService: NSObject, ObservableObject {
     static let proximityCategory = "PROXIMITY_NOTIFICATION"
     static let movementCategory = "MOVEMENT_NOTIFICATION"
     static let tunnelCategory = "TUNNEL_NOTIFICATION"
-    nonisolated static let rejsekortActionIdentifier = "OPEN_REJSEKORT_ACTION"
 
     static let rejsekortAppURL = URL(string: "https://app.rejsekort.dk")!
     static let rejsekortStoreURL = URL(string: "https://apps.apple.com/app/id6469603787")!
@@ -17,33 +16,26 @@ final class NotificationService: NSObject, ObservableObject {
     @Published var authorizationStatus: UNAuthorizationStatus = .notDetermined
     @Published var pendingRejsekortOpen: Bool = false
 
+    private var currentSettings: NotificationSettings = .default
+
     private override init() {
         super.init()
     }
 
     func configure(settings: NotificationSettings = .load()) {
+        currentSettings = settings
+
         let center = UNUserNotificationCenter.current()
         center.delegate = self
 
-        let rejsekortAction = UNNotificationAction(
-            identifier: Self.rejsekortActionIdentifier,
-            title: "Check in with Rejsekort",
-            options: [.foreground]
-        )
-
-        let proximityActions: [UNNotificationAction] =
-            (settings.rejsekortEnabled && settings.proximityRejsekortAction) ? [rejsekortAction] : []
-        let movementActions: [UNNotificationAction] =
-            (settings.rejsekortEnabled && settings.movementRejsekortAction) ? [rejsekortAction] : []
-
         let proximityCategory = UNNotificationCategory(
             identifier: Self.proximityCategory,
-            actions: proximityActions,
+            actions: [],
             intentIdentifiers: []
         )
         let movementCategory = UNNotificationCategory(
             identifier: Self.movementCategory,
-            actions: movementActions,
+            actions: [],
             intentIdentifiers: []
         )
         let tunnelCategory = UNNotificationCategory(
@@ -119,12 +111,23 @@ extension NotificationService: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        if response.actionIdentifier == Self.rejsekortActionIdentifier {
-            Task { @MainActor in
+        guard response.actionIdentifier == UNNotificationDefaultActionIdentifier else {
+            completionHandler()
+            return
+        }
+
+        let category = response.notification.request.content.categoryIdentifier
+
+        Task { @MainActor in
+            let settings = self.currentSettings
+            let shouldOpenRejsekort = settings.rejsekortEnabled && (
+                (category == Self.proximityCategory && settings.proximityRejsekortAction)
+                || (category == Self.movementCategory && settings.movementRejsekortAction)
+            )
+
+            if shouldOpenRejsekort {
                 self.pendingRejsekortOpen = true
-                completionHandler()
             }
-        } else {
             completionHandler()
         }
     }
