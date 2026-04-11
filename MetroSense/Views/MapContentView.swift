@@ -37,9 +37,6 @@ struct MapContentView: View {
     /// Threshold on predictedEndTranslation to snap between modes.
     private static let collapseThreshold: CGFloat = 10
     private static let expandThreshold: CGFloat = 10
-    /// Base collapsed height used as starting point before screen-relative capping.
-    private static let baseCollapsedHeight: CGFloat = 130
-    private static let baseLandscapeCollapsedHeight: CGFloat = 100
     private static let rejsekortButtonHeight: CGFloat = 44
 
     init(viewModel: MetroViewModel, onSettingsChanged: @escaping (NotificationSettings) -> Void) {
@@ -69,8 +66,7 @@ struct MapContentView: View {
     }
 
     private var currentCollapsedHeight: CGFloat {
-        let base = isLandscape ? Self.baseLandscapeCollapsedHeight : Self.baseCollapsedHeight
-        return min(base, maxOverlayHeight)
+        min(overlayHeaderAreaHeight, maxOverlayHeight)
     }
 
     /// Bottom padding so the lowest content stays above the iPhone's rounded
@@ -79,12 +75,12 @@ struct MapContentView: View {
         bottomSafeAreaInset > 0 ? bottomSafeAreaInset + 8 : 8
     }
 
-    /// Height of the non-scrollable header area (drag handle + status image).
+    /// Height of the non-scrollable header area (overlay header + status image).
     private var overlayHeaderAreaHeight: CGFloat {
-        let handleH: CGFloat = 17
+        let headerH: CGFloat = 44
         let imageH = isLandscape ? min(statusImageHeight * 0.6, 80) : min(statusImageHeight, 140)
         let imagePadding: CGFloat = 4 + (isLandscape ? 0 : 2)
-        return handleH + imageH + imagePadding
+        return headerH + imageH + imagePadding
     }
 
     /// Standard mode height sized to fit content, capped at 3/4 screen.
