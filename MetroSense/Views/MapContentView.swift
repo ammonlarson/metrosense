@@ -98,6 +98,16 @@ struct MapContentView: View {
         currentFullHeight
     }
 
+    /// Height of the overlay visible during drag, transitioning between
+    /// full and collapsed heights.  Used as the outer frame so the VStack
+    /// naturally resizes without an offset-based GeometryReader.
+    private var overlayVisibleHeight: CGFloat {
+        let collapseOffset = max(totalOverlayHeight - currentCollapsedHeight, 0)
+        let baseOffset = overlayExpanded ? 0 : collapseOffset
+        let clampedDrag = min(max(dragOffset + baseOffset, 0), collapseOffset)
+        return totalOverlayHeight - clampedDrag
+    }
+
     /// Height of the settings overlay header (drag handle + title row).
     private var settingsHeaderAreaHeight: CGFloat {
         17 + 4
@@ -332,54 +342,48 @@ struct MapContentView: View {
     }
 
     private var overlayCard: some View {
-        GeometryReader { proxy in
-            let fullHeight = proxy.size.height
-            let collapseOffset = max(fullHeight - currentCollapsedHeight, 0)
-            let baseOffset = overlayExpanded ? 0 : collapseOffset
-            let clampedDrag = min(max(dragOffset + baseOffset, 0), collapseOffset)
+        VStack(spacing: 0) {
+            overlayHeader
 
-            VStack(spacing: 0) {
-                overlayHeader
+            Image(metroStatusImage)
+                .resizable()
+                .scaledToFit()
+                .frame(height: isLandscape ? min(statusImageHeight * 0.6, 80) : min(statusImageHeight, 140))
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .padding(.top, 8)
+                .padding(.bottom, isLandscape ? 6 : 12)
+                .gesture(overlayDragGesture)
 
-                Image(metroStatusImage)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: isLandscape ? min(statusImageHeight * 0.6, 80) : min(statusImageHeight, 140))
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .padding(.top, 8)
-                    .padding(.bottom, isLandscape ? 6 : 12)
-                    .gesture(overlayDragGesture)
-
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        if isLandscape {
-                            landscapeContent
-                        } else {
-                            portraitContent
-                        }
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 0) {
+                    if isLandscape {
+                        landscapeContent
+                    } else {
+                        portraitContent
                     }
-                    .background(GeometryReader { geo in
-                        Color.clear.preference(key: ScrollContentHeightKey.self, value: geo.size.height)
-                    })
-                    .padding(.bottom, bottomContentInset)
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .onPreferenceChange(ScrollContentHeightKey.self) { height in
-                    measuredScrollContentHeight = height
-                }
+                .background(GeometryReader { geo in
+                    Color.clear.preference(key: ScrollContentHeightKey.self, value: geo.size.height)
+                })
+                .padding(.bottom, bottomContentInset)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .onPreferenceChange(ScrollContentHeightKey.self) { height in
+                measuredScrollContentHeight = height
+            }
 
-                Spacer(minLength: 0)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background {
-                (colorScheme == .dark ? Color.black : Color.white)
-                    .clipShape(UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
-                    .ignoresSafeArea(edges: .bottom)
-            }
-            .offset(y: clampedDrag)
+            Spacer(minLength: 0)
         }
-        .frame(height: totalOverlayHeight)
+        .frame(maxWidth: .infinity, alignment: .top)
+        .frame(height: totalOverlayHeight, alignment: .top)
+        .frame(height: overlayVisibleHeight, alignment: .top)
+        .clipped()
+        .background {
+            (colorScheme == .dark ? Color.black : Color.white)
+                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
+                .ignoresSafeArea(edges: .bottom)
+        }
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showRejsekortShortcut)
     }
 
@@ -813,15 +817,6 @@ struct MapContentView: View {
 
     // MARK: - Reset Camera Button
 
-    /// The vertical offset applied to the overlay card content, mirrored here
-    /// so the reset button tracks the overlay during drag and snap animations.
-    private var overlayOffset: CGFloat {
-        if settingsVisible { return 0 }
-        let collapseOffset = max(totalOverlayHeight - currentCollapsedHeight, 0)
-        let baseOffset = overlayExpanded ? 0 : collapseOffset
-        return min(max(dragOffset + baseOffset, 0), collapseOffset)
-    }
-
     private var resetCameraButton: some View {
         Button {
             isAutoFollowEnabled = true
@@ -835,7 +830,6 @@ struct MapContentView: View {
                 .padding(10)
                 .background(.ultraThinMaterial, in: Circle())
         }
-        .offset(y: overlayOffset)
         .accessibilityLabel(isAutoFollowEnabled ? "Following location" : "Recenter map")
         .animation(.easeInOut(duration: 0.2), value: isAutoFollowEnabled)
     }
