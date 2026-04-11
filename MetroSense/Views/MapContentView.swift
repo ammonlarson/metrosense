@@ -70,8 +70,13 @@ struct MapContentView: View {
         return min(base, maxOverlayHeight)
     }
 
+    private static let rejsekortButtonHeight: CGFloat = 44
+
     private var currentFullHeight: CGFloat {
-        let base = isLandscape ? Self.baseLandscapeFullHeight : Self.baseFullHeight
+        var base = isLandscape ? Self.baseLandscapeFullHeight : Self.baseFullHeight
+        if showRejsekortShortcut {
+            base += Self.rejsekortButtonHeight
+        }
         return min(base, maxOverlayHeight)
     }
 
@@ -281,6 +286,7 @@ struct MapContentView: View {
         }
         .frame(height: totalOverlayHeight)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: settingsVisible)
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: showRejsekortShortcut)
     }
 
     // MARK: - Portrait Content
