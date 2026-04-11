@@ -125,7 +125,7 @@ struct TestNotificationsView: View {
                     .font(.subheadline.bold())
                     .foregroundStyle(.primary)
 
-                Picker("Tap opens", selection: $settings.proximityTapAction) {
+                Picker("Alert tap opens", selection: $settings.proximityTapAction) {
                     Text("MetroSense").tag(NotificationSettings.NotificationTapAction.openMetroSense)
                     Text("Rejsekort").tag(NotificationSettings.NotificationTapAction.openRejsekort)
                 }
@@ -139,7 +139,7 @@ struct TestNotificationsView: View {
                     .font(.subheadline.bold())
                     .foregroundStyle(.primary)
 
-                Picker("Tap opens", selection: $settings.movementTapAction) {
+                Picker("Alert tap opens", selection: $settings.movementTapAction) {
                     Text("MetroSense").tag(NotificationSettings.NotificationTapAction.openMetroSense)
                     Text("Rejsekort").tag(NotificationSettings.NotificationTapAction.openRejsekort)
                 }
