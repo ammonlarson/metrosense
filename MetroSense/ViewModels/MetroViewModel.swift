@@ -1,6 +1,5 @@
 import CoreLocation
 import Combine
-import UserNotifications
 
 @MainActor
 final class MetroViewModel: ObservableObject {
@@ -139,7 +138,8 @@ final class MetroViewModel: ObservableObject {
                         lastMovementNotificationTime = Date()
                         NotificationService.shared.sendMetroDetected(
                             line: line.rawValue,
-                            fromStation: departure.name
+                            fromStation: departure.name,
+                            tapAction: settings.movementTapAction
                         )
                     }
                 }
@@ -191,17 +191,10 @@ final class MetroViewModel: ObservableObject {
         notifiedProximityStations.insert(station.name)
         lastProximityNotificationTime = Date()
 
-        let content = UNMutableNotificationContent()
-        content.title = "Near Station"
-        content.body = "You are near \(station.name)"
-        content.sound = .default
-
-        let request = UNNotificationRequest(
-            identifier: "proximity-\(station.name)-\(Date().timeIntervalSince1970)",
-            content: content,
-            trigger: nil
+        NotificationService.shared.sendProximityNotification(
+            stationName: station.name,
+            tapAction: settings.proximityTapAction
         )
-        UNUserNotificationCenter.current().add(request)
     }
 
     private func isMovementCooldownElapsed() -> Bool {

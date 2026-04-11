@@ -35,6 +35,8 @@ struct TestNotificationsView: View {
                 Text("Settings")
             }
 
+            rejsekortSection
+
             Section {
                 Button {
                     runTest()
@@ -110,6 +112,48 @@ struct TestNotificationsView: View {
         .onChange(of: settings) { _, newValue in
             if newValue.isValid {
                 newValue.save()
+            }
+        }
+    }
+
+    // MARK: - Rejsekort Section
+
+    private var rejsekortSection: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Metro Proximity")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.primary)
+
+                Picker("Alert tap opens", selection: $settings.proximityTapAction) {
+                    Text("MetroSense").tag(NotificationSettings.NotificationTapAction.openMetroSense)
+                    Text("Rejsekort").tag(NotificationSettings.NotificationTapAction.openRejsekort)
+                }
+
+                Toggle("Show Rejsekort button", isOn: $settings.proximityShowRejsekortPill)
+                    .tint(.blue)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("On-Metro Traveling")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.primary)
+
+                Picker("Alert tap opens", selection: $settings.movementTapAction) {
+                    Text("MetroSense").tag(NotificationSettings.NotificationTapAction.openMetroSense)
+                    Text("Rejsekort").tag(NotificationSettings.NotificationTapAction.openRejsekort)
+                }
+
+                Toggle("Show Rejsekort button", isOn: $settings.movementShowRejsekortPill)
+                    .tint(.blue)
+            }
+        } header: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Rejsekort")
+                Text("Choose what happens when you tap a notification and whether the Rejsekort shortcut button appears on the main screen.")
+                    .textCase(nil)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
         }
     }

@@ -369,21 +369,20 @@ struct MapContentView: View {
 
     private var showRejsekortShortcut: Bool {
         switch viewModel.tripState {
-        case .atStation, .onMetro:
-            return true
+        case .atStation:
+            return viewModel.settings.proximityShowRejsekortPill
+        case .onMetro:
+            return viewModel.settings.movementShowRejsekortPill
         case .idle, .arrived:
             return false
         }
     }
 
-    private static let rejsekortAppURL = URL(string: "https://app.rejsekort.dk")!
-    private static let rejsekortStoreURL = URL(string: "https://apps.apple.com/app/id6469603787")!
-
     private var rejsekortButton: some View {
         Button {
-            openURL(Self.rejsekortAppURL) { accepted in
+            openURL(NotificationService.rejsekortAppURL) { accepted in
                 if !accepted {
-                    openURL(Self.rejsekortStoreURL)
+                    openURL(NotificationService.rejsekortStoreURL)
                 }
             }
         } label: {

@@ -6,10 +6,17 @@ struct NotificationSettings: Equatable, Codable {
     var proximityEnabled: Bool
     var proximityRadius: Double // meters
     var proximityStationFilter: StationFilter
+    var proximityTapAction: NotificationTapAction
+    var proximityShowRejsekortPill: Bool
 
     enum StationFilter: Equatable, Codable {
         case all
         case selected(Set<String>) // station names
+    }
+
+    enum NotificationTapAction: String, Codable, CaseIterable, Equatable {
+        case openMetroSense
+        case openRejsekort
     }
 
     // MARK: - Movement Notifications
@@ -20,6 +27,8 @@ struct NotificationSettings: Equatable, Codable {
     var sustainedDurationSeconds: TimeInterval
     var requireStartAtStationFilter: StationFilter?
     var movementCooldownMinutes: Double
+    var movementTapAction: NotificationTapAction
+    var movementShowRejsekortPill: Bool
 
     // MARK: - Defaults
 
@@ -27,12 +36,16 @@ struct NotificationSettings: Equatable, Codable {
         proximityEnabled: true,
         proximityRadius: 150,
         proximityStationFilter: .all,
+        proximityTapAction: .openMetroSense,
+        proximityShowRejsekortPill: true,
         movementEnabled: true,
         minimumSpeedMPS: 40.0 / 3.6,
         maximumSpeedMPS: 90.0 / 3.6,
         sustainedDurationSeconds: 10,
         requireStartAtStationFilter: nil,
-        movementCooldownMinutes: 60
+        movementCooldownMinutes: 60,
+        movementTapAction: .openMetroSense,
+        movementShowRejsekortPill: true
     )
 
     // MARK: - km/h Convenience
@@ -93,6 +106,8 @@ extension NotificationSettings {
         case proximityEnabled
         case proximityRadius
         case proximityStationFilter
+        case proximityTapAction
+        case proximityShowRejsekortPill
         case movementEnabled
         case minimumSpeedMPS
         case maximumSpeedMPS
@@ -100,6 +115,8 @@ extension NotificationSettings {
         case requireStartAtStationFilter
         case requireStartAtStation // legacy key for backward compat
         case movementCooldownMinutes
+        case movementTapAction
+        case movementShowRejsekortPill
     }
 
     init(from decoder: Decoder) throws {
@@ -107,6 +124,8 @@ extension NotificationSettings {
         proximityEnabled = try container.decode(Bool.self, forKey: .proximityEnabled)
         proximityRadius = try container.decode(Double.self, forKey: .proximityRadius)
         proximityStationFilter = try container.decode(StationFilter.self, forKey: .proximityStationFilter)
+        proximityTapAction = try container.decodeIfPresent(NotificationTapAction.self, forKey: .proximityTapAction) ?? .openMetroSense
+        proximityShowRejsekortPill = try container.decodeIfPresent(Bool.self, forKey: .proximityShowRejsekortPill) ?? true
         movementEnabled = try container.decode(Bool.self, forKey: .movementEnabled)
         minimumSpeedMPS = try container.decode(Double.self, forKey: .minimumSpeedMPS)
         maximumSpeedMPS = try container.decode(Double.self, forKey: .maximumSpeedMPS)
@@ -121,6 +140,8 @@ extension NotificationSettings {
             requireStartAtStationFilter = nil
         }
         movementCooldownMinutes = try container.decodeIfPresent(Double.self, forKey: .movementCooldownMinutes) ?? 60
+        movementTapAction = try container.decodeIfPresent(NotificationTapAction.self, forKey: .movementTapAction) ?? .openMetroSense
+        movementShowRejsekortPill = try container.decodeIfPresent(Bool.self, forKey: .movementShowRejsekortPill) ?? true
     }
 
     func encode(to encoder: Encoder) throws {
@@ -128,12 +149,16 @@ extension NotificationSettings {
         try container.encode(proximityEnabled, forKey: .proximityEnabled)
         try container.encode(proximityRadius, forKey: .proximityRadius)
         try container.encode(proximityStationFilter, forKey: .proximityStationFilter)
+        try container.encode(proximityTapAction, forKey: .proximityTapAction)
+        try container.encode(proximityShowRejsekortPill, forKey: .proximityShowRejsekortPill)
         try container.encode(movementEnabled, forKey: .movementEnabled)
         try container.encode(minimumSpeedMPS, forKey: .minimumSpeedMPS)
         try container.encode(maximumSpeedMPS, forKey: .maximumSpeedMPS)
         try container.encode(sustainedDurationSeconds, forKey: .sustainedDurationSeconds)
         try container.encodeIfPresent(requireStartAtStationFilter, forKey: .requireStartAtStationFilter)
         try container.encode(movementCooldownMinutes, forKey: .movementCooldownMinutes)
+        try container.encode(movementTapAction, forKey: .movementTapAction)
+        try container.encode(movementShowRejsekortPill, forKey: .movementShowRejsekortPill)
     }
 }
 
