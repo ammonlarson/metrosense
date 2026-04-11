@@ -125,12 +125,12 @@ struct TestNotificationsView: View {
                     .font(.subheadline.bold())
                     .foregroundStyle(.primary)
 
-                Picker("Notification tap opens", selection: $settings.proximityTapAction) {
+                Picker("Tap opens", selection: $settings.proximityTapAction) {
                     Text("MetroSense").tag(NotificationSettings.NotificationTapAction.openMetroSense)
                     Text("Rejsekort").tag(NotificationSettings.NotificationTapAction.openRejsekort)
                 }
 
-                Toggle("Show Rejsekort pill button", isOn: $settings.proximityShowRejsekortPill)
+                Toggle("Show Rejsekort button", isOn: $settings.proximityShowRejsekortPill)
                     .tint(.blue)
             }
 
@@ -139,12 +139,12 @@ struct TestNotificationsView: View {
                     .font(.subheadline.bold())
                     .foregroundStyle(.primary)
 
-                Picker("Notification tap opens", selection: $settings.movementTapAction) {
+                Picker("Tap opens", selection: $settings.movementTapAction) {
                     Text("MetroSense").tag(NotificationSettings.NotificationTapAction.openMetroSense)
                     Text("Rejsekort").tag(NotificationSettings.NotificationTapAction.openRejsekort)
                 }
 
-                Toggle("Show Rejsekort pill button", isOn: $settings.movementShowRejsekortPill)
+                Toggle("Show Rejsekort button", isOn: $settings.movementShowRejsekortPill)
                     .tint(.blue)
             }
         } header: {
