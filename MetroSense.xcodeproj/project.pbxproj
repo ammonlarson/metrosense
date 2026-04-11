@@ -22,6 +22,7 @@
 		BDEA8D9D10B51FD3CB63E79E /* ProximitySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033B28468695ABC40411E0EF /* ProximitySettingsView.swift */; };
 		C4F154BC3A49FB5E2314FF35 /* MetroLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCADA81F1831CC5803DB2113 /* MetroLine.swift */; };
 		C628CB165B841562784910FB /* NotificationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE37611856ABD7622C0C3BA8 /* NotificationSettings.swift */; };
+		D7A3E91F4B2C80A3E5F69D12 /* TunnelSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C41F7E2A903DB5147E6BC08 /* TunnelSettingsView.swift */; };
 		D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */; };
 		E9F1EEBE43C0CB9188C774F4 /* TestNotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 679D07887772747157738ED3 /* TestNotificationsView.swift */; };
 		EB37E135E77FCACF2C70C068 /* MetroStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AEC0F64175BB303AD89638 /* MetroStation.swift */; };
@@ -41,6 +42,7 @@
 		679D07887772747157738ED3 /* TestNotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestNotificationsView.swift; sourceTree = "<group>"; };
 		76AE715724C3018308461364 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		78E97B6B2B8614B249637CDD /* TransitMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitMapView.swift; sourceTree = "<group>"; };
+		8C41F7E2A903DB5147E6BC08 /* TunnelSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelSettingsView.swift; sourceTree = "<group>"; };
 		9C2421502AA5169B997BE291 /* MetroSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetroSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A46816E662033897D01B62A6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AEF8CFF12F5A43CCBFAB4750 /* RejsekortSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RejsekortSettingsView.swift; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 				B764777F71F980FF1A1C6979 /* SplashScreen.swift */,
 				BE943D5532AC0FE89616930E /* StationFilterPickerView.swift */,
 				679D07887772747157738ED3 /* TestNotificationsView.swift */,
+				8C41F7E2A903DB5147E6BC08 /* TunnelSettingsView.swift */,
 				78E97B6B2B8614B249637CDD /* TransitMapView.swift */,
 			);
 			path = Views;
@@ -219,6 +222,7 @@
 				D99B99377918DDD079839B54 /* StationFilterPickerView.swift in Sources */,
 				E9F1EEBE43C0CB9188C774F4 /* TestNotificationsView.swift in Sources */,
 				92FECA2281EEED26195E98D0 /* TransitMapView.swift in Sources */,
+				D7A3E91F4B2C80A3E5F69D12 /* TunnelSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -120,6 +120,48 @@ extension MetroStation {
     }
 }
 
+// MARK: - Tunnel Entry Points
+
+extension MetroStation {
+    /// Stations at or near points where the metro transitions between surface and tunnel.
+    /// M1 surfaces south of Islands Brygge; M2 surfaces east of Lergravsparken.
+    /// M3 and M4 are entirely underground, so all their stations qualify.
+    static let tunnelEntryPoints: Set<String> = {
+        var entries = Set<String>()
+        // M1 transition zone: Islands Brygge is the last underground station heading south
+        entries.insert(MetroStation.islandsBrygge.name)
+        entries.insert(MetroStation.drByen.name)
+        // M2 transition zone: Lergravsparken is last underground heading east
+        entries.insert(MetroStation.lergravsparken.name)
+        entries.insert(MetroStation.oresund.name)
+        // M3 (Cityringen) is entirely underground
+        for station in MetroLine.m3.stations {
+            entries.insert(station.name)
+        }
+        // M4 is entirely underground
+        for station in MetroLine.m4.stations {
+            entries.insert(station.name)
+        }
+        // Underground shared trunk (M1/M2 from Vanlose to Christianshavn)
+        let sharedTrunk: [MetroStation] = [
+            .vanlose, .flintholm, .lindevang, .fasanvej,
+            .frederiksberg, .forum, .norreport, .kongensNytorv,
+            .christianshavn,
+        ]
+        for station in sharedTrunk {
+            entries.insert(station.name)
+        }
+        // M2-only underground stations
+        entries.insert(MetroStation.amagerbro.name)
+        return entries
+    }()
+
+    /// Whether this station is at or near a tunnel entry/exit point.
+    var isTunnelEntryPoint: Bool {
+        Self.tunnelEntryPoints.contains(name)
+    }
+}
+
 // MARK: - Station Catalog
 
 extension MetroStation {

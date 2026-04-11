@@ -114,6 +114,25 @@ struct SettingsView: View {
             }
 
             NavigationLink {
+                TunnelSettingsView(
+                    settings: $settings,
+                    allStationNames: allStationNames
+                )
+            } label: {
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Tunnel Detection")
+                        Text(tunnelStatusText)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: "arrow.down.to.line")
+                        .foregroundStyle(.blue)
+                }
+            }
+
+            NavigationLink {
                 RejsekortSettingsView(settings: $settings)
             } label: {
                 Label {
@@ -141,6 +160,10 @@ struct SettingsView: View {
         settings.movementEnabled ? "On — \(Int(settings.minimumSpeedKMH))–\(Int(settings.maximumSpeedKMH)) km/h" : "Off"
     }
 
+    private var tunnelStatusText: String {
+        settings.tunnelDetectionEnabled ? "On — \(Int(settings.tunnelSustainedDurationSeconds))s threshold" : "Off"
+    }
+
     private var rejsekortStatusText: String {
         settings.rejsekortEnabled ? "On" : "Off"
     }
@@ -160,7 +183,7 @@ struct SettingsView: View {
                     Text("min")
                         .foregroundStyle(.secondary)
                 }
-                Text("Minimum time between repeated alerts (applies to both proximity and movement).")
+                Text("Minimum time between repeated alerts (applies to proximity, movement, and tunnel).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

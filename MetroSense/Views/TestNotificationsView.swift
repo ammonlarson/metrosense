@@ -27,7 +27,7 @@ struct TestNotificationsView: View {
                         Text("min")
                             .foregroundStyle(.secondary)
                     }
-                    Text("Minimum time between repeated alerts (applies to both proximity and movement).")
+                    Text("Minimum time between repeated alerts (applies to proximity, movement, and tunnel).")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

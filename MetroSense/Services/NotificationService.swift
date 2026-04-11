@@ -8,6 +8,7 @@ final class NotificationService: NSObject, ObservableObject {
 
     static let proximityCategory = "PROXIMITY_NOTIFICATION"
     static let movementCategory = "MOVEMENT_NOTIFICATION"
+    static let tunnelCategory = "TUNNEL_NOTIFICATION"
     nonisolated static let rejsekortActionIdentifier = "OPEN_REJSEKORT_ACTION"
 
     static let rejsekortAppURL = URL(string: "https://app.rejsekort.dk")!
@@ -45,7 +46,12 @@ final class NotificationService: NSObject, ObservableObject {
             actions: movementActions,
             intentIdentifiers: []
         )
-        center.setNotificationCategories([proximityCategory, movementCategory])
+        let tunnelCategory = UNNotificationCategory(
+            identifier: Self.tunnelCategory,
+            actions: [],
+            intentIdentifiers: []
+        )
+        center.setNotificationCategories([proximityCategory, movementCategory, tunnelCategory])
     }
 
     func requestPermission() {
@@ -68,6 +74,21 @@ final class NotificationService: NSObject, ObservableObject {
 
         let request = UNNotificationRequest(
             identifier: "metro-detected-\(Date().timeIntervalSince1970)",
+            content: content,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(request)
+    }
+
+    func sendTunnelNotification(nearStation: String) {
+        let content = UNMutableNotificationContent()
+        content.title = "Possible Tunnel Travel"
+        content.body = "You may be traveling underground near \(nearStation)"
+        content.sound = .default
+        content.categoryIdentifier = Self.tunnelCategory
+
+        let request = UNNotificationRequest(
+            identifier: "tunnel-\(Date().timeIntervalSince1970)",
             content: content,
             trigger: nil
         )

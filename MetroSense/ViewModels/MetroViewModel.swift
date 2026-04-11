@@ -9,6 +9,8 @@ final class MetroViewModel: ObservableObject {
     @Published var speedKMH: Double = 0
     @Published var isUsingDegradedLocation: Bool = false
     @Published var isSignalLost: Bool = true
+    @Published var isTunnelDetected: Bool = false
+    @Published var tunnelNearStation: MetroStation?
     @Published var settings: NotificationSettings
 
     var currentLocation: CLLocation? { locationService.currentLocation }
@@ -17,6 +19,7 @@ final class MetroViewModel: ObservableObject {
 
     private let locationService: LocationService
     private var cancellables = Set<AnyCancellable>()
+    private var tunnelEvaluationTimer: Timer?
 
     // Track departure station when a trip begins
     private var departureStation: MetroStation?
@@ -24,6 +27,12 @@ final class MetroViewModel: ObservableObject {
     private var metroSpeedStartTime: Date?
     private(set) var lastMovementNotificationTime: Date?
     private(set) var lastProximityNotificationTime: Date?
+    private(set) var lastTunnelNotificationTime: Date?
+
+    // Tunnel detection state
+    private var signalLostStartTime: Date?
+    private var lastKnownLocationBeforeSignalLoss: CLLocation?
+    private var hasNotifiedCurrentTunnel = false
 
     /// Maximum distance (meters) for showing the nearest station on the home screen.
     private static let nearestStationMaxDistance: CLLocationDistance = 10_000
@@ -73,7 +82,10 @@ final class MetroViewModel: ObservableObject {
 
         locationService.$isSignalLost
             .receive(on: DispatchQueue.main)
-            .assign(to: &$isSignalLost)
+            .sink { [weak self] lost in
+                self?.handleSignalLostChange(lost)
+            }
+            .store(in: &cancellables)
     }
 
     private func evaluate(location: CLLocation, speed: Double) {
@@ -226,6 +238,90 @@ final class MetroViewModel: ObservableObject {
     private func isMetroSpeed(_ speed: Double) -> Bool {
         speed >= settings.minimumSpeedMPS && speed <= settings.maximumSpeedMPS
     }
+
+    // MARK: - Tunnel Detection
+
+    private func handleSignalLostChange(_ lost: Bool) {
+        isSignalLost = lost
+        if lost {
+            signalLostStartTime = Date()
+            lastKnownLocationBeforeSignalLoss = locationService.currentLocation
+            startTunnelEvaluationTimer()
+        } else {
+            signalLostStartTime = nil
+            lastKnownLocationBeforeSignalLoss = nil
+            hasNotifiedCurrentTunnel = false
+            tunnelEvaluationTimer?.invalidate()
+            tunnelEvaluationTimer = nil
+            isTunnelDetected = false
+            tunnelNearStation = nil
+        }
+    }
+
+    private func startTunnelEvaluationTimer() {
+        tunnelEvaluationTimer?.invalidate()
+        guard settings.tunnelDetectionEnabled else { return }
+
+        let interval = max(settings.tunnelSustainedDurationSeconds, 1)
+        let timer = Timer(timeInterval: interval, repeats: false) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.evaluateTunnel()
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        tunnelEvaluationTimer = timer
+    }
+
+    private func evaluateTunnel() {
+        guard settings.tunnelDetectionEnabled else { return }
+        guard isSignalLost else { return }
+        guard let lostStart = signalLostStartTime else { return }
+
+        let elapsed = Date().timeIntervalSince(lostStart)
+        guard elapsed >= settings.tunnelSustainedDurationSeconds else { return }
+
+        guard let lastLocation = lastKnownLocationBeforeSignalLoss else { return }
+
+        // Find the nearest station to where signal was lost
+        let allStations = MetroLine.all.flatMap { $0.stations }
+        guard let nearest = allStations
+            .map({ ($0, $0.distance(from: lastLocation)) })
+            .filter({ $0.1 <= MetroStation.proximityRadius * 3 }) // within 450m generous radius
+            .min(by: { $0.1 < $1.1 })
+        else { return }
+
+        let station = nearest.0
+
+        // Check tunnel entry point filter
+        if let filter = settings.tunnelEntryPointFilter {
+            switch filter {
+            case .all:
+                guard station.isTunnelEntryPoint else { return }
+            case .selected(let names):
+                guard names.contains(station.name) else { return }
+            }
+        }
+
+        isTunnelDetected = true
+        tunnelNearStation = station
+
+        // Send notification if enabled and cooldown allows
+        if settings.tunnelNotificationsEnabled,
+           !hasNotifiedCurrentTunnel,
+           isTunnelCooldownElapsed() {
+            hasNotifiedCurrentTunnel = true
+            lastTunnelNotificationTime = Date()
+            NotificationService.shared.sendTunnelNotification(nearStation: station.name)
+        }
+    }
+
+    private func isTunnelCooldownElapsed() -> Bool {
+        guard settings.movementCooldownSeconds > 0 else { return true }
+        guard let lastTime = lastTunnelNotificationTime else { return true }
+        return Date().timeIntervalSince(lastTime) >= settings.movementCooldownSeconds
+    }
+
+    // MARK: - Helpers
 
     private func closestStation(for location: CLLocation) -> (station: MetroStation, distance: CLLocationDistance)? {
         let allStations = MetroLine.all.flatMap { $0.stations }

@@ -21,6 +21,13 @@ struct NotificationSettings: Equatable, Codable {
     var requireStartAtStationFilter: StationFilter?
     var movementCooldownMinutes: Double
 
+    // MARK: - Tunnel Detection
+
+    var tunnelDetectionEnabled: Bool
+    var tunnelNotificationsEnabled: Bool
+    var tunnelSustainedDurationSeconds: TimeInterval
+    var tunnelEntryPointFilter: StationFilter?
+
     // MARK: - Rejsekort
 
     var rejsekortEnabled: Bool
@@ -42,6 +49,10 @@ struct NotificationSettings: Equatable, Codable {
         sustainedDurationSeconds: 10,
         requireStartAtStationFilter: nil,
         movementCooldownMinutes: 60,
+        tunnelDetectionEnabled: false,
+        tunnelNotificationsEnabled: true,
+        tunnelSustainedDurationSeconds: 30,
+        tunnelEntryPointFilter: nil,
         rejsekortEnabled: true,
         alwaysShowRejsekortPill: false,
         proximityShowRejsekortPill: true,
@@ -77,6 +88,17 @@ struct NotificationSettings: Equatable, Codable {
         movementCooldownMinutes * 60
     }
 
+    var tunnelEntryPointsEnabled: Bool {
+        get { tunnelEntryPointFilter != nil }
+        set {
+            if newValue {
+                tunnelEntryPointFilter = tunnelEntryPointFilter ?? .all
+            } else {
+                tunnelEntryPointFilter = nil
+            }
+        }
+    }
+
     // MARK: - Validation
 
     var isValid: Bool {
@@ -86,6 +108,7 @@ struct NotificationSettings: Equatable, Codable {
             && minimumSpeedMPS <= maximumSpeedMPS
             && sustainedDurationSeconds >= 0
             && movementCooldownMinutes >= 0
+            && tunnelSustainedDurationSeconds >= 0
             && {
                 if case .selected(let stations) = proximityStationFilter {
                     return !stations.isEmpty
@@ -94,6 +117,12 @@ struct NotificationSettings: Equatable, Codable {
             }()
             && {
                 if case .selected(let stations) = requireStartAtStationFilter {
+                    return !stations.isEmpty
+                }
+                return true
+            }()
+            && {
+                if case .selected(let stations) = tunnelEntryPointFilter {
                     return !stations.isEmpty
                 }
                 return true
@@ -115,6 +144,10 @@ extension NotificationSettings {
         case requireStartAtStationFilter
         case requireStartAtStation // legacy key for backward compat
         case movementCooldownMinutes
+        case tunnelDetectionEnabled
+        case tunnelNotificationsEnabled
+        case tunnelSustainedDurationSeconds
+        case tunnelEntryPointFilter
         case rejsekortEnabled
         case alwaysShowRejsekortPill
         case proximityShowRejsekortPill
@@ -142,6 +175,10 @@ extension NotificationSettings {
             requireStartAtStationFilter = nil
         }
         movementCooldownMinutes = try container.decodeIfPresent(Double.self, forKey: .movementCooldownMinutes) ?? 60
+        tunnelDetectionEnabled = try container.decodeIfPresent(Bool.self, forKey: .tunnelDetectionEnabled) ?? false
+        tunnelNotificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .tunnelNotificationsEnabled) ?? true
+        tunnelSustainedDurationSeconds = try container.decodeIfPresent(TimeInterval.self, forKey: .tunnelSustainedDurationSeconds) ?? 30
+        tunnelEntryPointFilter = try container.decodeIfPresent(StationFilter.self, forKey: .tunnelEntryPointFilter)
         rejsekortEnabled = try container.decodeIfPresent(Bool.self, forKey: .rejsekortEnabled) ?? true
         alwaysShowRejsekortPill = try container.decodeIfPresent(Bool.self, forKey: .alwaysShowRejsekortPill) ?? false
         proximityShowRejsekortPill = try container.decodeIfPresent(Bool.self, forKey: .proximityShowRejsekortPill) ?? true
@@ -161,6 +198,10 @@ extension NotificationSettings {
         try container.encode(sustainedDurationSeconds, forKey: .sustainedDurationSeconds)
         try container.encodeIfPresent(requireStartAtStationFilter, forKey: .requireStartAtStationFilter)
         try container.encode(movementCooldownMinutes, forKey: .movementCooldownMinutes)
+        try container.encode(tunnelDetectionEnabled, forKey: .tunnelDetectionEnabled)
+        try container.encode(tunnelNotificationsEnabled, forKey: .tunnelNotificationsEnabled)
+        try container.encode(tunnelSustainedDurationSeconds, forKey: .tunnelSustainedDurationSeconds)
+        try container.encodeIfPresent(tunnelEntryPointFilter, forKey: .tunnelEntryPointFilter)
         try container.encode(rejsekortEnabled, forKey: .rejsekortEnabled)
         try container.encode(alwaysShowRejsekortPill, forKey: .alwaysShowRejsekortPill)
         try container.encode(proximityShowRejsekortPill, forKey: .proximityShowRejsekortPill)

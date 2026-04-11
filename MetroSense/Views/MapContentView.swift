@@ -25,6 +25,7 @@ struct MapContentView: View {
 
     @State private var showingProximitySettings: Bool = false
     @State private var showingMovementSettings: Bool = false
+    @State private var showingTunnelSettings: Bool = false
     @State private var showingTestNotifications: Bool = false
     @State private var showingRejsekortSettings: Bool = false
 
@@ -262,6 +263,29 @@ struct MapContentView: View {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             showingRejsekortSettings = false
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.body)
+                                .foregroundStyle(.blue)
+                        }
+                        .accessibilityLabel("Close")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showingTunnelSettings) {
+            NavigationStack {
+                TunnelSettingsView(
+                    settings: Binding(
+                        get: { viewModel.settings },
+                        set: { onSettingsChanged($0) }
+                    ),
+                    allStationNames: allStationNames
+                )
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showingTunnelSettings = false
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.body)
@@ -640,6 +664,17 @@ struct MapContentView: View {
                 .padding(.horizontal)
 
             settingsRow(
+                icon: "arrow.down.to.line",
+                title: "Tunnel Detection",
+                subtitle: tunnelStatusText
+            ) {
+                showingTunnelSettings = true
+            }
+
+            Divider()
+                .padding(.horizontal)
+
+            settingsRow(
                 icon: "bell.badge",
                 title: "Notifications",
                 subtitle: "Cooldown & test alerts"
@@ -658,6 +693,10 @@ struct MapContentView: View {
                 showingRejsekortSettings = true
             }
         }
+    }
+
+    private var tunnelStatusText: String {
+        viewModel.settings.tunnelDetectionEnabled ? "On — \(Int(viewModel.settings.tunnelSustainedDurationSeconds))s threshold" : "Off"
     }
 
     private var rejsekortStatusText: String {
@@ -731,7 +770,7 @@ struct MapContentView: View {
     }
 
     private var signalLostBanner: some View {
-        VStack {
+        VStack(spacing: 6) {
             HStack(spacing: 6) {
                 Image(systemName: "location.slash.fill")
                     .foregroundStyle(.red)
@@ -746,9 +785,29 @@ struct MapContentView: View {
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
             .padding(.horizontal, 16)
             .frame(maxWidth: isLandscape ? 400 : .infinity)
+
+            if viewModel.isTunnelDetected, let station = viewModel.tunnelNearStation {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.down.to.line")
+                        .foregroundStyle(.purple)
+                    Text("Possible tunnel travel")
+                        .font(.footnote.bold())
+                    Spacer()
+                    Text("Near \(station.name)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(10)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal, 16)
+                .frame(maxWidth: isLandscape ? 400 : .infinity)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+
             Spacer()
         }
         .padding(.top, 8)
+        .animation(.easeInOut(duration: 0.3), value: viewModel.isTunnelDetected)
     }
 
     // MARK: - Reset Camera Button
