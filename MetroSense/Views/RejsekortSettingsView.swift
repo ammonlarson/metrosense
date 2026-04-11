@@ -36,9 +36,9 @@ struct RejsekortSettingsView: View {
                     Toggle("Movement Detection", isOn: $settings.movementRejsekortAction)
                         .tint(.blue)
                 } header: {
-                    Text("Notification Action")
+                    Text("Open Rejsekort on Notification Tap")
                 } footer: {
-                    Text("Add a \"Check in with Rejsekort\" button to notification banners so you can open Rejsekort directly.")
+                    Text("When enabled, tapping a notification opens the Rejsekort app instead of MetroSense.")
                 }
             }
         }
