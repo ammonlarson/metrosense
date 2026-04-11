@@ -4,7 +4,7 @@ import UIKit
 @main
 struct MetroSenseApp: App {
     init() {
-        NotificationService.shared.configure()
+        NotificationService.shared.configure(settings: .load())
     }
 
     var body: some Scene {

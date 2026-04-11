@@ -32,6 +32,7 @@ final class MetroViewModel: ObservableObject {
         self.locationService = locationService
         self.settings = NotificationSettings.load()
         bindLocation()
+        bindSettings()
     }
 
     func start() {
@@ -40,6 +41,21 @@ final class MetroViewModel: ObservableObject {
     }
 
     // MARK: - Private
+
+    private func bindSettings() {
+        $settings
+            .removeDuplicates {
+                $0.rejsekortEnabled == $1.rejsekortEnabled
+                    && $0.proximityRejsekortAction == $1.proximityRejsekortAction
+                    && $0.movementRejsekortAction == $1.movementRejsekortAction
+            }
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { newSettings in
+                NotificationService.shared.configure(settings: newSettings)
+            }
+            .store(in: &cancellables)
+    }
 
     private func bindLocation() {
         locationService.$currentLocation
@@ -138,8 +154,7 @@ final class MetroViewModel: ObservableObject {
                         lastMovementNotificationTime = Date()
                         NotificationService.shared.sendMetroDetected(
                             line: line.rawValue,
-                            fromStation: departure.name,
-                            tapAction: settings.movementTapAction
+                            fromStation: departure.name
                         )
                     }
                 }
@@ -192,8 +207,7 @@ final class MetroViewModel: ObservableObject {
         lastProximityNotificationTime = Date()
 
         NotificationService.shared.sendProximityNotification(
-            stationName: station.name,
-            tapAction: settings.proximityTapAction
+            stationName: station.name
         )
     }
 

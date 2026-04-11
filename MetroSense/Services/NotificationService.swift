@@ -8,6 +8,7 @@ final class NotificationService: NSObject, ObservableObject {
 
     static let proximityCategory = "PROXIMITY_NOTIFICATION"
     static let movementCategory = "MOVEMENT_NOTIFICATION"
+    nonisolated static let rejsekortActionIdentifier = "OPEN_REJSEKORT_ACTION"
 
     static let rejsekortAppURL = URL(string: "https://app.rejsekort.dk")!
     static let rejsekortStoreURL = URL(string: "https://apps.apple.com/app/id6469603787")!
@@ -19,18 +20,29 @@ final class NotificationService: NSObject, ObservableObject {
         super.init()
     }
 
-    func configure() {
+    func configure(settings: NotificationSettings = .load()) {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
 
+        let rejsekortAction = UNNotificationAction(
+            identifier: Self.rejsekortActionIdentifier,
+            title: "Check in with Rejsekort",
+            options: [.foreground]
+        )
+
+        let proximityActions: [UNNotificationAction] =
+            (settings.rejsekortEnabled && settings.proximityRejsekortAction) ? [rejsekortAction] : []
+        let movementActions: [UNNotificationAction] =
+            (settings.rejsekortEnabled && settings.movementRejsekortAction) ? [rejsekortAction] : []
+
         let proximityCategory = UNNotificationCategory(
             identifier: Self.proximityCategory,
-            actions: [],
+            actions: proximityActions,
             intentIdentifiers: []
         )
         let movementCategory = UNNotificationCategory(
             identifier: Self.movementCategory,
-            actions: [],
+            actions: movementActions,
             intentIdentifiers: []
         )
         center.setNotificationCategories([proximityCategory, movementCategory])
@@ -47,13 +59,12 @@ final class NotificationService: NSObject, ObservableObject {
         }
     }
 
-    func sendMetroDetected(line: String, fromStation: String, tapAction: NotificationSettings.NotificationTapAction) {
+    func sendMetroDetected(line: String, fromStation: String) {
         let content = UNMutableNotificationContent()
         content.title = "Metro Detected"
         content.body = "You're on the \(line) from \(fromStation)"
         content.sound = .default
         content.categoryIdentifier = Self.movementCategory
-        content.userInfo = ["tapAction": tapAction.rawValue]
 
         let request = UNNotificationRequest(
             identifier: "metro-detected-\(Date().timeIntervalSince1970)",
@@ -63,13 +74,12 @@ final class NotificationService: NSObject, ObservableObject {
         UNUserNotificationCenter.current().add(request)
     }
 
-    func sendProximityNotification(stationName: String, tapAction: NotificationSettings.NotificationTapAction) {
+    func sendProximityNotification(stationName: String) {
         let content = UNMutableNotificationContent()
         content.title = "Near Station"
         content.body = "You are near \(stationName)"
         content.sound = .default
         content.categoryIdentifier = Self.proximityCategory
-        content.userInfo = ["tapAction": tapAction.rawValue]
 
         let request = UNNotificationRequest(
             identifier: "proximity-\(stationName)-\(Date().timeIntervalSince1970)",
@@ -88,11 +98,7 @@ extension NotificationService: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        let userInfo = response.notification.request.content.userInfo
-        let tapActionRaw = userInfo["tapAction"] as? String ?? ""
-        let tapAction = NotificationSettings.NotificationTapAction(rawValue: tapActionRaw)
-
-        if tapAction == .openRejsekort {
+        if response.actionIdentifier == Self.rejsekortActionIdentifier {
             Task { @MainActor in
                 self.pendingRejsekortOpen = true
                 completionHandler()

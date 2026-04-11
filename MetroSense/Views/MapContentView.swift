@@ -24,6 +24,7 @@ struct MapContentView: View {
     @State private var showingProximitySettings: Bool = false
     @State private var showingMovementSettings: Bool = false
     @State private var showingTestNotifications: Bool = false
+    @State private var showingRejsekortSettings: Bool = false
     @State private var showSettingsIcon: Bool = true
 
     private let allStationNames: [String]
@@ -214,6 +215,28 @@ struct MapContentView: View {
                 }
             }
         }
+        .sheet(isPresented: $showingRejsekortSettings) {
+            NavigationStack {
+                RejsekortSettingsView(
+                    settings: Binding(
+                        get: { viewModel.settings },
+                        set: { onSettingsChanged($0) }
+                    )
+                )
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            showingRejsekortSettings = false
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.body)
+                                .foregroundStyle(.blue)
+                        }
+                        .accessibilityLabel("Close")
+                    }
+                }
+            }
+        }
     }
 
     private func updateCameraIfNeeded() {
@@ -370,6 +393,8 @@ struct MapContentView: View {
     }
 
     private var showRejsekortShortcut: Bool {
+        guard viewModel.settings.rejsekortEnabled else { return false }
+        if viewModel.settings.alwaysShowRejsekortPill { return true }
         switch viewModel.tripState {
         case .atStation:
             return viewModel.settings.proximityShowRejsekortPill
@@ -582,7 +607,22 @@ struct MapContentView: View {
             ) {
                 showingTestNotifications = true
             }
+
+            Divider()
+                .padding(.horizontal)
+
+            settingsRow(
+                icon: "creditcard",
+                title: "Rejsekort",
+                subtitle: rejsekortStatusText
+            ) {
+                showingRejsekortSettings = true
+            }
         }
+    }
+
+    private var rejsekortStatusText: String {
+        viewModel.settings.rejsekortEnabled ? "On" : "Off"
     }
 
     private func settingsRow(

@@ -112,6 +112,22 @@ struct SettingsView: View {
                         .foregroundStyle(.blue)
                 }
             }
+
+            NavigationLink {
+                RejsekortSettingsView(settings: $settings)
+            } label: {
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Rejsekort")
+                        Text(rejsekortStatusText)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: "creditcard")
+                        .foregroundStyle(.blue)
+                }
+            }
         } header: {
             Text("Categories")
         }
@@ -123,6 +139,10 @@ struct SettingsView: View {
 
     private var movementStatusText: String {
         settings.movementEnabled ? "On — \(Int(settings.minimumSpeedKMH))–\(Int(settings.maximumSpeedKMH)) km/h" : "Off"
+    }
+
+    private var rejsekortStatusText: String {
+        settings.rejsekortEnabled ? "On" : "Off"
     }
 
     // MARK: - Notifications Section
