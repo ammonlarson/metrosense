@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "xcodebuild: Build",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "build",
+                "-scheme",
+                "MetroSense",
+                "-destination",
+                "generic/platform=iOS Simulator",
+                "-configuration",
+                "Debug",
+                "CODE_SIGN_IDENTITY=\"\"",
+                "CODE_SIGNING_REQUIRED=NO",
+                "CODE_SIGNING_ALLOWED=NO"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "xcodegen: Generate Project",
+            "type": "shell",
+            "command": "xcodegen",
+            "args": [
+                "generate"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
