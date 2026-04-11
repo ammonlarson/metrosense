@@ -410,10 +410,10 @@ struct NotificationTestResult: Equatable {
 
                     if matchingStations.isEmpty {
                         proximityState = .wouldNotFire
-                        let inRangeNames = stationsInRange.map(\.name).joined(separator: ", ")
+                        let inRangeNames = uniqueStationNames(stationsInRange)
                         proximityDetail = "Stations in range (\(inRangeNames)) are not in your selected filter."
                     } else {
-                        let names = matchingStations.map(\.name).joined(separator: ", ")
+                        let names = uniqueStationNames(matchingStations)
                         if let remaining = cooldownRemaining {
                             proximityState = .cooldownBlocked(remaining: remaining)
                             proximityDetail = "Near: \(names). Would fire, but cooldown is active."
@@ -470,7 +470,7 @@ struct NotificationTestResult: Equatable {
                         stationDetail = "Speed \(speedKMH) km/h is within metro range but \"Require start at station\" is enabled and you are not near any station."
                     } else {
                         stationCheckPassed = true
-                        let stationNames = nearbyStations.map(\.name).joined(separator: ", ")
+                        let stationNames = uniqueStationNames(nearbyStations)
                         stationDetail = "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h). Near station: \(stationNames)."
                     }
                 case .selected(let names):
@@ -480,12 +480,12 @@ struct NotificationTestResult: Equatable {
                         if nearbyStations.isEmpty {
                             stationDetail = "Speed \(speedKMH) km/h is within metro range but \"Require start at station\" is enabled with a station filter, and you are not near any station."
                         } else {
-                            let nearbyNames = nearbyStations.map(\.name).joined(separator: ", ")
+                            let nearbyNames = uniqueStationNames(nearbyStations)
                             stationDetail = "Speed \(speedKMH) km/h is within metro range but nearby stations (\(nearbyNames)) are not in the required start-station filter."
                         }
                     } else {
                         stationCheckPassed = true
-                        let stationNames = matching.map(\.name).joined(separator: ", ")
+                        let stationNames = uniqueStationNames(matching)
                         stationDetail = "Speed \(speedKMH) km/h is within metro range (\(String(format: "%.0f", settings.minimumSpeedKMH))–\(String(format: "%.0f", settings.maximumSpeedKMH)) km/h). Near selected station: \(stationNames)."
                     }
                 }
@@ -521,6 +521,13 @@ struct NotificationTestResult: Equatable {
             movementState: movementState,
             movementDetail: movementDetail
         )
+    }
+
+    private static func uniqueStationNames(_ stations: [MetroStation]) -> String {
+        var seen = Set<String>()
+        return stations.compactMap { station in
+            seen.insert(station.name).inserted ? station.name : nil
+        }.joined(separator: ", ")
     }
 
     private static func cooldownRemaining(
